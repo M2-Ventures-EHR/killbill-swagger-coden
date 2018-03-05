@@ -1,0 +1,15 @@
+{{>licenseInfo}}
+
+package {{package}};
+
+import java.util.Objects;
+import java.util.UUID;
+import java.math.BigDecimal;
+import org.joda.time.DateTime;
+import org.joda.time.LocalDate;
+
+{{#models}}
+{{#model}}
+{{#isEnum}}{{>modelEnum}}{{/isEnum}}{{^isEnum}}{{>pojo}}{{/isEnum}}
+{{/model}}
+{{/models}}

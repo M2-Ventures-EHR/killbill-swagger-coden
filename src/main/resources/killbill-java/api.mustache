@@ -1,0 +1,113 @@
+package {{package}};
+
+
+{{#imports}}import {{import}};
+{{/imports}}
+
+
+import com.google.common.collect.Multimap;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.HashMultimap;
+import com.google.common.base.MoreObjects;
+
+import org.killbill.billing.client.KillBillClientException;
+import org.killbill.billing.client.KillBillHttpClient;
+import org.killbill.billing.client.RequestOptions;
+
+
+{{#operations}}
+public class {{classname}} {
+
+    private final KillBillHttpClient httpClient;
+
+    public {{classname}}() {
+        this(new KillBillHttpClient());
+    }
+
+    public {{classname}}(final KillBillHttpClient httpClient) {
+        this.httpClient = httpClient;
+    }
+
+    {{#operation}}
+    {{#isPost}}
+    public {{#bodyParam}}{{dataType}}{{/bodyParam}} {{operationId}}({{#allParams}}{{^isHeaderParam}}final {{{dataType}}} {{paramName}}, {{/isHeaderParam}}{{/allParams}} final RequestOptions inputOptions) throws KillBillClientException {
+        {{#allParams}}
+        {{^isHeaderParam}}
+        {{#required}}
+        Preconditions.checkNotNull({{paramName}}, "Missing the required parameter '{{paramName}}' when calling {{operationId}}");
+        {{/required}}
+        {{/isHeaderParam}}
+        {{/allParams}}
+
+        final String uri = "{{{path}}}"{{#pathParams}}
+          .replaceAll("\\{" + "{{baseName}}" + "\\}", {{localVariablePrefix}}apiClient.escapeString({{{paramName}}}.toString())){{/pathParams}};
+
+        {{#queryParams}}
+        {{#-first}}
+        final Multimap<String, String> queryParams = HashMultimap.<String, String>create(inputOptions.getQueryParams());
+        {{/-first}}
+        {{/queryParams}}
+        {{#queryParams}}
+        queryParams.put("{{baseName}}", String.valueOf({{paramName}}));
+        {{/queryParams}}
+
+        final Boolean followLocation = MoreObjects.firstNonNull(inputOptions.getFollowLocation(), Boolean.TRUE);
+        {{#queryParams}}
+        {{#-first}}
+        final RequestOptions requestOptions = inputOptions.extend()
+            .withFollowLocation(followLocation)
+            .withQueryParams(queryParams)
+            .build();
+        {{/-first}}
+        {{/queryParams}}
+        {{^queryParams}}
+        final RequestOptions requestOptions = inputOptions.extend()
+            .withFollowLocation(followLocation)
+            .build();
+        {{/queryParams}}
+
+        return httpClient.doPost(uri, {{#bodyParam}}{{paramName}}{{/bodyParam}}, {{#bodyParam}}{{dataType}}{{/bodyParam}}.class, requestOptions);
+    }
+
+    {{/isPost}}
+    {{#isGet}}
+    public {{#returnType}}{{{returnType}}} {{/returnType}}{{operationId}}({{#allParams}}{{^isHeaderParam}}final {{{dataType}}} {{paramName}}, {{/isHeaderParam}}{{/allParams}} final RequestOptions inputOptions) throws KillBillClientException {
+
+        {{#allParams}}
+        {{^isHeaderParam}}
+        {{#required}}
+        Preconditions.checkNotNull({{paramName}}, "Missing the required parameter '{{paramName}}' when calling {{operationId}}");
+        {{/required}}
+        {{/isHeaderParam}}
+        {{/allParams}}
+
+        final String uri = "{{{path}}}"{{#pathParams}}
+          .replaceAll("\\{" + "{{baseName}}" + "\\}", {{localVariablePrefix}}apiClient.escapeString({{{paramName}}}.toString())){{/pathParams}};
+
+        {{#queryParams}}
+        {{#-first}}
+        final Multimap<String, String> queryParams = HashMultimap.<String, String>create(inputOptions.getQueryParams());
+        {{/-first}}
+        {{/queryParams}}
+        {{#queryParams}}
+        queryParams.put("{{baseName}}", String.valueOf({{paramName}}));
+        {{/queryParams}}
+
+        {{#queryParams}}
+        {{#-first}}
+        final RequestOptions requestOptions = inputOptions.extend().withQueryParams(queryParams).build();
+        {{/-first}}
+        {{/queryParams}}
+        {{^queryParams}}
+        final RequestOptions requestOptions = inputOptions.extend().build();
+        {{/queryParams}}
+
+        {{#returnType}}
+        return httpClient.doGet(uri, {{{returnType}}}.class, requestOptions);
+        {{/returnType}}
+    }
+
+    {{/isGet}}
+    {{/operation}}
+}
+{{/operations}}
