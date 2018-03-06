@@ -76,7 +76,11 @@ The code customization allows for the following:
 
 In addition to code customization, we can also define our own Mustache templates to generate the client code we want to have.
 
+Modifiying the generator, including the Mustache template would require building the repo: `mvn -DskipTests=true -Dmaven.javadoc.skip=true install`
+
 So, in summary, the `kbswagger.json` input along with the custom code and templates provide a flexible way to generate client libraries in any language.
+
+
 
 # Supported Languages
 
