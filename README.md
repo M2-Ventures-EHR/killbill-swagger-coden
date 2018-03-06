@@ -47,15 +47,16 @@ swagger-codegen  generate \
 
 Note that, it may be useful to start the generator using the jar and potentially attach a debugger (e.g port `5005`):
 
+Asssuming the path for `swagger-codegen-cli.jar` is set into `GEN_JAR` env variable
+
 ```
 java \
--Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005 \
 -DmodelDocs=false \
 -DgenerateApiDocs=false \
--cp target/killbill-swagger-codegen-1.0.0.jar \
-io.swagger.codegen.Codegen \
+-cp $GEN_JAR:generator/target/killbill-swagger-coden-1.0.0.jar \
+io.swagger.codegen.SwaggerCodegen generate \
 -l killbill-java  \
--i kbswagger.json \
+-i kbswagger.json  \
 -o ../killbill-java-client
 ```
 
@@ -86,6 +87,11 @@ it consists of some templates and code module:
 
 * [KillbillJavaGenerator](https://github.com/killbill/killbill-swagger-coden/blob/master/src/main/java/org/killbill/billing/codegen/languages/KillbillJavaGenerator.java)
 * [killbill-java](https://github.com/killbill/killbill-swagger-coden/tree/master/src/main/resources/killbill-java) templates.
+
+The code generation has been limited to generating model and api files, but at this point we have decided to reuse our existing http client, and reuse the mechanism we have in place, [RequestOptions](https://github.com/killbill/killbill-client-java/blob/killbill-client-java-0.41.7/src/main/java/org/killbill/billing/client/RequestOptions.java) --to pass additional headers through our apis.
+
+
+The generated code has been check-in in the existing Kill Bill [client java repo](https://github.com/killbill/killbill-client-java), but in a branch called `swagger-gen`. Note that, at this point this is still an experiment, and we don't know whether this branch will eventually be merged.
 
 
 
