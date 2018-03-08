@@ -13,7 +13,7 @@ import com.google.common.base.MoreObjects;
 import org.killbill.billing.client.KillBillClientException;
 import org.killbill.billing.client.KillBillHttpClient;
 import org.killbill.billing.client.RequestOptions;
-
+import org.killbill.billing.util.api.AuditLevel;
 
 {{#operations}}
 public class {{classname}} {
@@ -30,7 +30,7 @@ public class {{classname}} {
 
     {{#operation}}
     {{#isPost}}
-    public {{#bodyParam}}{{dataType}}{{/bodyParam}} {{operationId}}({{#allParams}}{{^isHeaderParam}}final {{{dataType}}} {{paramName}}, {{/isHeaderParam}}{{/allParams}} final RequestOptions inputOptions) throws KillBillClientException {
+    public {{#bodyParam}}{{dataType}}{{/bodyParam}} {{operationId}}({{#allParams}}{{^isHeaderParam}}final {{dataType}} {{paramName}}, {{/isHeaderParam}}{{/allParams}} final RequestOptions inputOptions) throws KillBillClientException {
         {{#allParams}}
         {{^isHeaderParam}}
         {{#required}}
@@ -71,7 +71,7 @@ public class {{classname}} {
 
     {{/isPost}}
     {{#isGet}}
-    public {{#returnType}}{{{returnType}}} {{/returnType}}{{operationId}}({{#allParams}}{{^isHeaderParam}}final {{{dataType}}} {{paramName}}, {{/isHeaderParam}}{{/allParams}} final RequestOptions inputOptions) throws KillBillClientException {
+    public {{#returnType}}{{{returnType}}} {{/returnType}}{{operationId}}({{#allParams}}{{^isHeaderParam}}final {{#isEnum}}{{enumName}} {{paramName}}{{/isEnum}}{{^isEnum}}{{dataType}} {{paramName}}{{/isEnum}}, {{/isHeaderParam}}{{/allParams}} final RequestOptions inputOptions) throws KillBillClientException {
 
         {{#allParams}}
         {{^isHeaderParam}}

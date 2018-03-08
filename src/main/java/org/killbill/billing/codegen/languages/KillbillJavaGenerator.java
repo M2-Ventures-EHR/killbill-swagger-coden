@@ -111,6 +111,11 @@ public class KillbillJavaGenerator extends AbstractJavaCodegen implements Codege
     return objs;
   }
 
+  @Override
+  public String toEnumName(CodegenProperty property) {
+    return sanitizeName(camelize(property.name));
+  }
+
   private static class ExtendedCodegenOperation extends CodegenOperation {
 
     public boolean isGet, isPost, isDelete, isPut, isOptions;
