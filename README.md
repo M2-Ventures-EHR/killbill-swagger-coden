@@ -28,11 +28,10 @@ Note that there is some usefull information about annotations in these pages.
 
 ## Using the generator
 
-**Pre-requisite:** Read the [swagger README](https://github.com/swagger-api/swagger-codegen/blob/master/README.md) to install the binary
-and get some understanding on how things work.
+**Pre-requisite:** Read the [swagger README](https://github.com/swagger-api/swagger-codegen/blob/master/README.md) to install the binary and get some understanding on how things work.
 
 
-Then, we can generate client generated code; for instance for `java`, we would run the following command:
+The standard command to generate the code for `java` would be:
 
 ```
 swagger-codegen  generate \
@@ -45,9 +44,10 @@ swagger-codegen  generate \
 -o ../killbill-client-java # Repo where to generate the code
 ```
 
-Note that, it may be useful to start the generator using the jar and potentially attach a debugger (e.g port `5005`):
+However, because we are using a custom module -- and also because we may want to set breakpoints to debug -- a better option
+is to launch the genrator this way, specifying both the ``swagger-codegen-cli.jar` and our module jar:
 
-Asssuming the path for `swagger-codegen-cli.jar` is set into `GEN_JAR` env variable
+So, asssuming the path for `swagger-codegen-cli.jar` is set into `GEN_JAR` env variable:
 
 ```
 java \
