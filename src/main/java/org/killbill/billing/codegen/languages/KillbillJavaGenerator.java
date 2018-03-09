@@ -22,17 +22,12 @@ public class KillbillJavaGenerator extends AbstractJavaCodegen implements Codege
 
     private static final String DOCS_PATH = "docs/";
 
-
-    private static final String MAIN_JAVA = "main/java";
-    private static final String MAIN_RESOURCE = "main/resources";
-
     private static final String API_PACKAGE = "org.killbill.billing.client.api.gen";
     private static final String MODEL_PACKAGE = "org.killbill.billing.client.model.gen";
 
     private static final String HTTP_USER_AGENT = "killbill/java-client";
 
     private static final String DATE_LIBRARY_JODA = "joda";
-    private static final Boolean BIG_DECIMAL_AS_STRING = true;
 
 
     /**
@@ -145,8 +140,7 @@ public class KillbillJavaGenerator extends AbstractJavaCodegen implements Codege
             }
         }
         operationsMap.put("operation", extOperations);
-
-
+        
         return objs;
     }
 
