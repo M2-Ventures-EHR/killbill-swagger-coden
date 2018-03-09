@@ -6,6 +6,7 @@ import io.swagger.models.Model;
 import io.swagger.models.Swagger;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -129,14 +130,23 @@ public class KillbillJavaGenerator extends AbstractJavaCodegen implements Codege
     public Map<String, Object> postProcessOperations(Map<String, Object> objs) {
 
         final Map<String, Object> operationsMap = (Map<String, Object>) super.postProcessOperations(objs).get("operations");
-        List<CodegenOperation> operations = (List<CodegenOperation>) operationsMap.get("operation");
-        List<ExtendedCodegenOperation> extOperations = new ArrayList<>(operations.size());
+        final List<CodegenOperation> operations = (List<CodegenOperation>) operationsMap.get("operation");
+        final List<ExtendedCodegenOperation> extOperations = new ArrayList<>(operations.size());
+
+        final List<Map<String, String>> imports = (List<Map<String, String>>) objs.get("imports");
 
         for (CodegenOperation op : operations) {
             final ExtendedCodegenOperation ext = new ExtendedCodegenOperation(op);
             extOperations.add(ext);
+            if (ext.isKillBillObjects) {
+                Map<String, String> im = new LinkedHashMap<String, String>();
+                im.put("import", String.format("org.killbill.billing.client.model.%s", ext.returnType));
+                imports.add(im);
+            }
         }
         operationsMap.put("operation", extOperations);
+
+
         return objs;
     }
 
@@ -155,7 +165,7 @@ public class KillbillJavaGenerator extends AbstractJavaCodegen implements Codege
 
     private static class ExtendedCodegenOperation extends CodegenOperation {
 
-        public boolean isGet, isPost, isDelete, isPut, isOptions, isPagination;
+        public boolean isGet, isPost, isDelete, isPut, isOptions, isKillBillObjects;
 
         private ExtendedCodegenOperation(CodegenOperation o) {
             super();
@@ -216,11 +226,9 @@ public class KillbillJavaGenerator extends AbstractJavaCodegen implements Codege
             this.isPut = "PUT".equalsIgnoreCase(httpMethod);
             this.isDelete = "DELETE".equalsIgnoreCase(httpMethod);
             this.isOptions = "OPTIONS".equalsIgnoreCase(httpMethod);
-            this.isPagination = path.endsWith("pagination");
-            if (isPagination) {
-                // KillBillObjects
+            if (returnContainer != null && returnContainer.equals("array")) {
+                this.isKillBillObjects = true;
                 this.returnType = String.format("%ss", this.returnBaseType);
-                this.imports.add(String.format("org.killbill.billing.client.model.%ss", this.returnBaseType));
             }
         }
     }
