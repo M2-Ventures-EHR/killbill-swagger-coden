@@ -90,10 +90,43 @@ public class KillbillJavaGenerator extends AbstractJavaCodegen implements Codege
 
     httpUserAgent = HTTP_USER_AGENT;
 
-    serializeBigDecimalAsString = BIG_DECIMAL_AS_STRING;
     hideGenerationTimestamp = true; /* Does not seem to work, use cli option to disable */
+
+
+    typeMapping.put("array", "List");
+    typeMapping.put("map", "Map");
+
+    typeMapping.put("file", "java.io.File");
+
+    importMapping.clear();
+    importMapping.put("UUID", "java.util.UUID");
+    importMapping.put("List", "java.util.List");
+    importMapping.put("LinkedList", "java.util.LinkedList");
+    importMapping.put("ArrayList", "java.util.ArrayList");
+    importMapping.put("DateTime", "org.joda.time.DateTime");
+    importMapping.put("LocalDate", "org.joda.time.LocalDate");
+    importMapping.put("BigDecimal", "java.math.BigDecimal");
+    importMapping.put("HashMap", "java.util.HashMap");
+    importMapping.put("Map", "java.util.Map");
+
+    instantiationTypes.put("array", "java.util.ArrayList");
+    instantiationTypes.put("map", "java.util.HashMap");
   }
 
+  @Override
+  public void preprocessSwagger(Swagger swagger) {
+    // Remove auditLogs from definitions as they will be included in our base KillBillObject
+    for (final Model m : swagger.getDefinitions().values()) {
+      m.getProperties().remove("auditLogs");
+    }
+  }
+
+
+
+  @Override
+  public Map<String, Object> postProcessModels(Map<String, Object> objs) {
+    return objs;
+  }
 
   // Transform CodegenOperation obj into ExtendedCodegenOperation to add properties into mustache maps
   @Override
@@ -113,8 +146,16 @@ public class KillbillJavaGenerator extends AbstractJavaCodegen implements Codege
 
   @Override
   public String toEnumName(CodegenProperty property) {
+    // Given a property with name 'auditLevel' => Will generate a enum type 'AuditLevel'
     return sanitizeName(camelize(property.name));
   }
+
+
+  @Override
+  public void postProcessModelProperty(CodegenModel model, CodegenProperty property) {
+    // Overwritten to not generate imports for ApiModel and ApiModelProperty
+  }
+
 
   private static class ExtendedCodegenOperation extends CodegenOperation {
 
