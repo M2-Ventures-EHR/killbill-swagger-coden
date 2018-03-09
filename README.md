@@ -16,6 +16,11 @@ The swagger schema can be obtained by hitting a running instance of Kill Bill:
 curl http://127.0.0.1:8080/swagger.json > ./kbswagger.json 
 ```
 
+Note that we can also export yam using:
+```
+curl http://127.0.0.1:8080/swagger.yaml > ./kbswagger.yaml 
+```
+
 While generating the client code, it is possible that some of the annotations are missing or incorrect, leading to incorrect generation
 and so in this case, such (server) annotations should be modified. There is a special Kill Bill branch, `work-for-release-0.19.x-doc`,
 which can be used to submit PRs for that purpose.
@@ -51,6 +56,8 @@ So, asssuming the path for `swagger-codegen-cli.jar` is set into `GEN_JAR` env v
 
 ```
 java \
+-DapiDocs=false \
+-DapiTests=false \
 -DmodelDocs=false \
 -DgenerateApiDocs=false \
 -cp $GEN_JAR:generator/target/killbill-swagger-coden-1.0.0.jar \
