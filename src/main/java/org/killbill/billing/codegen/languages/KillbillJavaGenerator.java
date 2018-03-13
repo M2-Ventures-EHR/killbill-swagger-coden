@@ -5,10 +5,8 @@ import io.swagger.codegen.languages.AbstractJavaCodegen;
 import io.swagger.models.Model;
 import io.swagger.models.Swagger;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.IOException;
+import java.util.*;
 
 public class KillbillJavaGenerator extends AbstractJavaCodegen implements CodegenConfig {
 
@@ -60,10 +58,22 @@ public class KillbillJavaGenerator extends AbstractJavaCodegen implements Codege
         return "Generates a killbill-java client library.";
     }
 
+    private final Map<String, Class> apiEnums;
+
     public KillbillJavaGenerator() {
         super();
         templateDir = "killbill-java";
         embeddedTemplateDir = "killbill-java";
+
+
+
+        try {
+            apiEnums = ClassUtil.findAPIEnum("/Users/sbrossier/.m2/repository/org/kill-bill/billing/killbill-api/0.51.9/killbill-api-0.51.9.jar");
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -102,18 +112,36 @@ public class KillbillJavaGenerator extends AbstractJavaCodegen implements Codege
         importMapping.put("HashMap", "java.util.HashMap");
         importMapping.put("Map", "java.util.Map");
 
-        instantiationTypes.put("array", "java.util.ArrayList");
-        instantiationTypes.put("map", "java.util.HashMap");
+        // Kill Bill API
+        for (final String key : apiEnums.keySet()) {
+            importMapping.put(key, apiEnums.get(key).getName().replaceAll("\\$", "."));
+        }
+
+        instantiationTypes.put("List", "java.util.ArrayList");
+        instantiationTypes.put("Map", "java.util.HashMap");
     }
 
     @Override
     public void preprocessSwagger(Swagger swagger) {
         // Remove auditLogs from definitions as they will be included in our base KillBillObject
         for (final Model m : swagger.getDefinitions().values()) {
-            m.getProperties().remove("auditLogs");
+            if (m.getProperties() != null) {
+                m.getProperties().remove("auditLogs");
+            }
         }
     }
 
+
+    private  String findEnumType(final String firstEnumValue) {
+        for (final String key : apiEnums.keySet()) {
+            Class claz = apiEnums.get(key);
+            if (EnumSet.allOf(claz).iterator().next().toString().equals(firstEnumValue)) {
+                return key;
+            }
+
+        }
+        throw new IllegalStateException("Cannot find enum with first value " + firstEnumValue);
+    }
 
     @Override
     public Map<String, Object> postProcessModels(Map<String, Object> objs) {
@@ -133,29 +161,81 @@ public class KillbillJavaGenerator extends AbstractJavaCodegen implements Codege
         for (CodegenOperation op : operations) {
             final ExtendedCodegenOperation ext = new ExtendedCodegenOperation(op);
             extOperations.add(ext);
-            if (ext.isKillBillObjects) {
-                Map<String, String> im = new LinkedHashMap<String, String>();
-                im.put("import", String.format("org.killbill.billing.client.model.%s", ext.returnType));
-                imports.add(im);
+            if (ext.returnType != null && ext.isListContainer) {
+                addImportIfRequired(imports, String.format("org.killbill.billing.client.model.%s", ext.returnType));
             }
+            if (ext.bodyParam != null && ext.bodyParam.isContainer) {
+                addImportIfRequired(imports, String.format("org.killbill.billing.client.model.%s", ext.bodyParam.dataType));
+            }
+
+            if (ext.isListContainer) {
+                addImportIfRequired(imports, "java.util.List");
+            } else if (ext.isMapContainer) {
+                addImportIfRequired(imports, "java.util.Map");
+            }
+            for (final CodegenParameter p : ext.allParams) {
+                if (p.isEnum) {
+                    if (!p.isContainer) {
+                        final String enumImport = importMapping.get(p.datatypeWithEnum);
+                        addImportIfRequired(imports, enumImport);
+                    } else if (p.items.isEnum) {
+                        final String enumImport = importMapping.get(p.items.datatypeWithEnum);
+                        addImportIfRequired(imports, enumImport);
+                    }
+                }
+                if (p.isListContainer) {
+                    addImportIfRequired(imports, "java.util.List");
+                } else if (p.isMapContainer) {
+                    addImportIfRequired(imports, "java.util.Map");
+                }
+            }
+
         }
         operationsMap.put("operation", extOperations);
-        
+
         return objs;
+    }
+
+
+    private void addImportIfRequired(final List<Map<String, String>> imports, String newImport) {
+        for (Map<String, String> im : imports) {
+            for (String i : im.values()) {
+                if (i.equals(newImport)) {
+                    return;
+                }
+            }
+        }
+        final Map<String, String> im = new LinkedHashMap<String, String>();
+        im.put("import", newImport);
+        imports.add(im);
     }
 
     @Override
     public String toEnumName(CodegenProperty property) {
-        // Given a property with name 'auditLevel' => Will generate a enum type 'AuditLevel'
+        if (property.isEnum) {
+            if (property._enum != null && property._enum.size() > 0) {
+                final String guessedEnumType = findEnumType(property._enum.get(0));
+                return guessedEnumType;
+            } else if (property.datatypeWithEnum != null) {
+                return property.datatypeWithEnum;
+            }
+        }
+        System.err.println("Mising _enum for " + property.name);
         return sanitizeName(camelize(property.name));
     }
 
-
     @Override
     public void postProcessModelProperty(CodegenModel model, CodegenProperty property) {
-        // Overwritten to not generate imports for ApiModel and ApiModelProperty
+        if (property.isEnum) {
+            if (!property.isContainer) {
+                final String guessedEnumType = findEnumType(property._enum.get(0));
+                model.imports.add(guessedEnumType);
+            } else if (property.items.isEnum) {
+                final String guessedEnumType = findEnumType(property.items._enum.get(0));
+                model.imports.add(guessedEnumType);
+            }
+        }
     }
-
 
     private static class ExtendedCodegenOperation extends CodegenOperation {
 
@@ -220,6 +300,10 @@ public class KillbillJavaGenerator extends AbstractJavaCodegen implements Codege
             this.isPut = "PUT".equalsIgnoreCase(httpMethod);
             this.isDelete = "DELETE".equalsIgnoreCase(httpMethod);
             this.isOptions = "OPTIONS".equalsIgnoreCase(httpMethod);
+            if ((isPost || isPut) && bodyParam != null && bodyParam.isContainer) {
+                this.isKillBillObjects = true;
+                this.bodyParam.dataType = String.format("%ss", this.bodyParam.baseType);
+            }
             if (returnContainer != null && returnContainer.equals("array")) {
                 this.isKillBillObjects = true;
                 this.returnType = String.format("%ss", this.returnBaseType);

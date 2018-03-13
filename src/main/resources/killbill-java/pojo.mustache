@@ -3,18 +3,6 @@ import org.killbill.billing.client.model.KillBillObject;
 public class {{classname}} extends KillBillObject {
 
     {{#vars}}
-      {{#isEnum}}
-      {{^isContainer}}
-    {{>modelInnerEnum}}
-      {{/isContainer}}
-      {{/isEnum}}
-      {{#items.isEnum}}
-        {{#items}}
-        {{^isContainer}}
-    {{>modelInnerEnum}}
-        {{/isContainer}}
-        {{/items}}
-      {{/items.isEnum}}
     {{#jackson}}
     @JsonProperty("{{baseName}}")
     {{#withXml}}
