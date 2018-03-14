@@ -22,10 +22,6 @@ CURL="curl"
 JQ="jq"
 JAVA="java"
 
-# TODO SCRIPT PARAMS
-CLIENT="killbill-java"
-OUTPUT="/Users/sbrossier/Src/killbill/killbill-client-java"
-
 
 #
 # LOCATION OF MAVEN .M2
@@ -94,32 +90,22 @@ fi
 #                                                                             #
 ###############################################################################
 
-function myecho() {
-  for i in "$@"; do
-    case "$i" in
-      *\ *)
-        echo -n "\"$i\" " ;;
-      *\&*)
-        echo -n "\"$i\" " ;;
-      *)
-      echo -n "$i "
-      ;;
-    esac
-  done
-  echo ""
+function usage() {
+  echo "./build.sh -l <language> -o <output> [-d] [-w] " >&2
+  echo "Example: Generate code for java and wait for java debugger to start " >&2
+  echo "./build.sh -l killbill-java -o ../killbill-client-java -d -w" >&2
+  exit 1
 }
 
+
 function kb_curl() {
-  myecho $CURL "$@" >&2
   $CURL --fail --silent -u $KB_USER_CREDS "$@"
   local ret=$?
   if [ $ret -ne 0 ]; then
-    myecho "Failed to execute command:" $CURL_CMD "$@"
     exit 1
   fi
   echo ""
 }
-
 
 function kb_api() {
   kb_curl \
@@ -144,9 +130,6 @@ function kb_swagger() {
 }
 
 
-#
-#
-#
 function extract_version() {
   local input=$1
   local key=$2
@@ -193,10 +176,18 @@ function generate_client_code() {
   local swaggerInput=$2
   local client=$3
   local output=$4
+  local wait_for_debug=$5
 
   echo "Generating client code for language $client into $$output" >&2
 
-  $JAVA \
+  local java_debug=
+  if  [ ! -z $wait_for_debug ]; then
+    java_debug=" -agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005 "
+    echo "Waiting for debug to connect on port 5005..." >&2
+    echo "" >&2
+  fi
+
+  $JAVA $java_debug\
   -DkbApiJar=$apiJar \
   -DapiDocs=false \
   -DapiTests=false \
@@ -229,6 +220,19 @@ function copy_version_file() {
 ###############################################################################
 
 
+while getopts ":o:l:dw" options; do
+  case $options in
+        w ) WAIT_DEBUGGER=1;;
+        o ) OUTPUT=$OPTARG;;
+        l ) LANGUAGE=$OPTARG;;
+    h ) usage;;
+    * ) usage;;
+  esac
+done
+
+
+
+
 
 # Create tmp dir
 TMP=`mktemp -d`
@@ -254,7 +258,7 @@ kb_swagger > "$TMP/kbswagger.yaml"
 head "$TMP/kbswagger.yaml"
 
 # Run generator
-generate_client_code $apiJar "$TMP/kbswagger.yaml" $CLIENT $OUTPUT
+generate_client_code $apiJar "$TMP/kbswagger.yaml" $LANGUAGE $OUTPUT $WAIT_DEBUGGER
 
 # Copy VERSION file
 copy_version_file $TMP $OUTPUT
