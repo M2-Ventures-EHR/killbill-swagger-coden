@@ -27,7 +27,6 @@ public class KillbillJavaGenerator extends AbstractJavaCodegen implements Codege
 
     private static final String DATE_LIBRARY_JODA = "joda";
 
-
     /**
      * Configures the type of generator.
      *
@@ -65,10 +64,13 @@ public class KillbillJavaGenerator extends AbstractJavaCodegen implements Codege
         templateDir = "killbill-java";
         embeddedTemplateDir = "killbill-java";
 
-
+        final String kbApiJar = System.getProperty("kbApiJar");
+        if (kbApiJar == null) {
+            throw new IllegalArgumentException("Need to specify KB api version: -DkbApiJar=<location of the jar>");
+        }
 
         try {
-            apiEnums = ClassUtil.findAPIEnum("/Users/sbrossier/.m2/repository/org/kill-bill/billing/killbill-api/0.51.9/killbill-api-0.51.9.jar");
+            apiEnums = ClassUtil.findAPIEnum(kbApiJar);
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         } catch (IOException e) {
@@ -101,6 +103,8 @@ public class KillbillJavaGenerator extends AbstractJavaCodegen implements Codege
 
         typeMapping.put("file", "java.io.File");
 
+
+
         importMapping.clear();
         importMapping.put("UUID", "java.util.UUID");
         importMapping.put("List", "java.util.List");
@@ -111,6 +115,7 @@ public class KillbillJavaGenerator extends AbstractJavaCodegen implements Codege
         importMapping.put("BigDecimal", "java.math.BigDecimal");
         importMapping.put("HashMap", "java.util.HashMap");
         importMapping.put("Map", "java.util.Map");
+
 
         // Kill Bill API
         for (final String key : apiEnums.keySet()) {

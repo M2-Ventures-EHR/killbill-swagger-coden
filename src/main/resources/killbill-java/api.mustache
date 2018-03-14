@@ -1,19 +1,19 @@
+{{>copyright}}
+
 package {{package}};
 
 
 {{#imports}}import {{import}};
 {{/imports}}
 
-
 import com.google.common.collect.Multimap;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.HashMultimap;
 import com.google.common.base.MoreObjects;
+import com.google.common.collect.HashMultimap;
 
 import org.killbill.billing.client.KillBillClientException;
 import org.killbill.billing.client.KillBillHttpClient;
 import org.killbill.billing.client.RequestOptions;
-import org.killbill.billing.util.api.AuditLevel;
 
 
 /**
