@@ -49,23 +49,21 @@ swagger-codegen  generate \
 -o ../killbill-client-java # Repo where to generate the code
 ```
 
-However, because we are using a custom module -- and also because we may want to set breakpoints to debug -- a better option
-is to launch the genrator this way, specifying both the ``swagger-codegen-cli.jar` and our module jar:
 
-So, asssuming the path for `swagger-codegen-cli.jar` is set into `GEN_JAR` env variable:
+However, to simplify things one can use the `build.sh` script:
+
+* The script will retrieve the KB version (requires a running instance of Kill Bill)
+* The script will retrieve the swagger spec (requires a running instance of Kill Bill)
+* It will then run the generator
+* Finally it will copy the `VERSION` file, under the client `.swagger-codegen` directory to keep track of the api against which this was generated.
+
+The script contains a first section that may be required to edit if default settings are not acceptable (KB URL, path for binaries, ...)
 
 ```
-java \
--DapiDocs=false \
--DapiTests=false \
--DmodelDocs=false \
--DgenerateApiDocs=false \
--cp $GEN_JAR:generator/target/killbill-swagger-coden-1.0.0.jar \
-io.swagger.codegen.SwaggerCodegen generate \
--l killbill-java  \
--i kbswagger.json  \
--o ../killbill-java-client
+# Generate the KB client code and wait for debugger to start on port 5005:
+> ./build.sh -l killbill-java -o ../killbill-client-java -w
 ```
+
 
 ## Internals
 
