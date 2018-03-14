@@ -45,19 +45,19 @@ KB_SWAGGER_CODEGEN_JAR="target/killbill-swagger-coden-$KB_SWAGGER_CODEGEN_VERSIO
 ###############################################################################
 
 
-$CURL --version > /dev/null
+$CURL --version > /dev/null 2>&1
 if [ $? -ne 0 ]; then
   echo "Abort: Need to have a curl command setup in the PATH" >&2
   exit 1;
 fi
 
-$JQ --version > /dev/null
+$JQ --version > /dev/null 2>&1
 if [ $? -ne 0 ]; then
   echo "Abort: Need to have a jq command setup in the PATH" >&2
   exit 1;
 fi
 
-$JAVA -version > /dev/null
+$JAVA -version > /dev/null 2>&1
 if [ $? -ne 0 ]; then
   echo "Abort: Need to have a java command setup in the PATH" >&2
   exit 1;
@@ -91,9 +91,10 @@ fi
 ###############################################################################
 
 function usage() {
-  echo "./build.sh -l <language> -o <output> [-d] [-w] " >&2
-  echo "Example: Generate code for java and wait for java debugger to start " >&2
-  echo "./build.sh -l killbill-java -o ../killbill-client-java -d -w" >&2
+  echo "> ./build.sh -l <language> -o <output> [-d] [-w] " >&2
+  echo "" >&2
+  echo "# Example to generate code for java and wait for java debugger to start on port 5005: " >&2
+  echo "> ./build.sh -l killbill-java -o ../killbill-client-java -d -w" >&2
   exit 1
 }
 
