@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 #set -x
 
 ###############################################################################
@@ -94,7 +95,7 @@ function usage() {
   echo "> ./build.sh -l <language> -o <output> [-d] [-w] " >&2
   echo "" >&2
   echo "# Example to generate code for java and wait for java debugger to start on port 5005: " >&2
-  echo "> ./build.sh -l killbill-java -o ../killbill-client-java -d -w" >&2
+  echo "> ./build.sh -l killbill-java -o ../killbill-client-java -w" >&2
   exit 1
 }
 
@@ -103,9 +104,14 @@ function kb_curl() {
   $CURL --fail --silent -u $KB_USER_CREDS "$@"
   local ret=$?
   if [ $ret -ne 0 ]; then
+    if [ $ret -eq 7 ]; then
+        echo "CURL: Fail to connect to host " >&2
+    else
+        echo "CURL: Failed " >&2
+    fi
+    echo "EXIT...... " >&2
     exit 1
   fi
-  echo ""
 }
 
 function kb_api() {
@@ -139,6 +145,7 @@ function extract_version() {
 
 
 function write_version_file() {
+
 
   echo "Extracting node info from Kill Bill" >&2
 
@@ -201,7 +208,7 @@ function generate_client_code() {
   -o $output
 }
 
-function copy_version_file() {
+function copy_files() {
 
   local tmp=$1
   local output=$2
@@ -212,6 +219,8 @@ function copy_version_file() {
     mkdir $output/.swagger-codegen
   fi
   cp "$tmp/VERSION" $output/.swagger-codegen
+
+  cp "$tmp/kbswagger.yaml" $output/.swagger-codegen
 }
 
 ###############################################################################
@@ -244,14 +253,14 @@ function cleanup {
 }
 trap cleanup EXIT
 
+# Fetch KB VERSIONS
+NODE_INFO=`kb_node_info`
 
 # Create VERSION FILE
-write_version_file `kb_node_info` $TMP
+write_version_file $NODE_INFO $TMP
 
 # Extract KB api artifact jar
 apiJar=`validate_and_return_api_jar "$TMP/VERSION"`
-
-echo "apiJar is $apiJar"
 
 # Retrieve swagger.yml spec
 kb_swagger > "$TMP/kbswagger.yaml"
@@ -262,4 +271,4 @@ head "$TMP/kbswagger.yaml"
 generate_client_code $apiJar "$TMP/kbswagger.yaml" $LANGUAGE $OUTPUT $WAIT_DEBUGGER
 
 # Copy VERSION file
-copy_version_file $TMP $OUTPUT
+copy_files $TMP $OUTPUT
