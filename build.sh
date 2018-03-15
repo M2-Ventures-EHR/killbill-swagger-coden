@@ -96,6 +96,9 @@ function usage() {
   echo "" >&2
   echo "# Example to generate code for java and wait for java debugger to start on port 5005: " >&2
   echo "> ./build.sh -l killbill-java -o ../killbill-client-java -w" >&2
+  echo "" >&2
+  echo "# Example to generate code from input file and api version " >&2
+  echo "> ./build.sh -l killbill-java -o ../killbill-client-java -i <swagger.yaml> -a <killbill_api_version>" >&2
   exit 1
 }
 
@@ -164,11 +167,7 @@ EOF
 
 function validate_and_return_api_jar() {
 
-  local versionFile=$1
-
-  echo "Fetching killbill api jar : $versionFile" >&2
-
-  local kbApiVersion=`grep kbApiVersion $versionFile  | cut -d '=' -f 2`
+  local kbApiVersion=$1
   local kbapi="$M2/repository/org/kill-bill/billing/killbill-api/$kbApiVersion/killbill-api-$kbApiVersion.jar"
   if [ ! -f $kbapi ]; then
     echo "Abort: Cannot find kb api jar $kbapi  " >&2
@@ -230,11 +229,13 @@ function copy_files() {
 ###############################################################################
 
 
-while getopts ":o:l:dw" options; do
+while getopts ":o:i:a:l:dw" options; do
   case $options in
         w ) WAIT_DEBUGGER=1;;
         o ) OUTPUT=$OPTARG;;
         l ) LANGUAGE=$OPTARG;;
+        i ) INPUT=$OPTARG;;
+        a ) API_VERSION=$OPTARG;;
     h ) usage;;
     * ) usage;;
   esac
@@ -253,22 +254,41 @@ function cleanup {
 }
 trap cleanup EXIT
 
-# Fetch KB VERSIONS
-NODE_INFO=`kb_node_info`
-
-# Create VERSION FILE
-write_version_file $NODE_INFO $TMP
-
-# Extract KB api artifact jar
-apiJar=`validate_and_return_api_jar "$TMP/VERSION"`
 
 # Retrieve swagger.yml spec
-kb_swagger > "$TMP/kbswagger.yaml"
+if [ -z $INPUT ]; then
 
-head "$TMP/kbswagger.yaml"
+    # Fetch KB VERSIONS
+    NODE_INFO=`kb_node_info`
+
+    # Create VERSION FILE
+    write_version_file $NODE_INFO $TMP
+
+    # Extract Api version
+    API_VERSION=`grep kbApiVersion "$TMP/VERSION"  | cut -d '=' -f 2`
+
+    kb_swagger > "$TMP/kbswagger.yaml"
+    INPUT="$TMP/kbswagger.yaml"
+else
+    if [ ! -f $INPUT ]; then
+       echo "Abort: Cannot find swagger spec $INPUT  " >&2
+       exit 1;
+    fi
+    if [ -z API_VERSION ]; then
+       echo "Abort: Requires to pass KB api version when using input swagger file (Kill Bill servernot running) " >&2
+       exit 1;
+    fi
+fi
+
+# Extract KB api artifact jar
+API_JAR=`validate_and_return_api_jar $API_VERSION`
+
 
 # Run generator
-generate_client_code $apiJar "$TMP/kbswagger.yaml" $LANGUAGE $OUTPUT $WAIT_DEBUGGER
+generate_client_code $API_JAR $INPUT $LANGUAGE $OUTPUT $WAIT_DEBUGGER
 
 # Copy VERSION file
-copy_files $TMP $OUTPUT
+if [ -z $INPUT ]; then
+    copy_files $TMP $OUTPUT
+fi
+
