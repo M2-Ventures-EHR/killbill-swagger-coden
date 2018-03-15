@@ -14,6 +14,7 @@ import com.google.common.collect.HashMultimap;
 import org.killbill.billing.client.KillBillClientException;
 import org.killbill.billing.client.KillBillHttpClient;
 import org.killbill.billing.client.RequestOptions;
+import org.killbill.billing.client.RequestOptions.RequestOptionsBuilder;
 
 
 /**
@@ -37,7 +38,7 @@ public class {{classname}} {
 
     {{#operation}}
     {{#isPost}}
-    public {{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}{{#bodyParam}}{{{dataType}}}{{/bodyParam}}{{^bodyParam}}void{{/bodyParam}}{{/returnType}} {{operationId}}({{#allParams}}{{^isHeaderParam}}final {{{dataType}}} {{paramName}}, {{/isHeaderParam}}{{/allParams}} final RequestOptions inputOptions) throws KillBillClientException {
+    public {{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}void{{/returnType}} {{operationId}}({{#allParams}}{{^isHeaderParam}}final {{{dataType}}} {{paramName}}, {{/isHeaderParam}}{{/allParams}} final RequestOptions inputOptions) throws KillBillClientException {
         {{#allParams}}
         {{^isHeaderParam}}
         {{#required}}
@@ -58,21 +59,25 @@ public class {{classname}} {
         queryParams.put("{{baseName}}", String.valueOf({{paramName}}));
         {{/queryParams}}
 
+        final RequestOptionsBuilder inputOptionsBuilder = inputOptions.extend();
         final Boolean followLocation = MoreObjects.firstNonNull(inputOptions.getFollowLocation(), Boolean.TRUE);
+        inputOptionsBuilder.withFollowLocation(followLocation);
         {{#queryParams}}
         {{#-first}}
-        final RequestOptions requestOptions = inputOptions.extend()
-            .withFollowLocation(followLocation)
-            .withQueryParams(queryParams)
-            .build();
+        inputOptionsBuilder.withQueryParams(queryParams);
         {{/-first}}
         {{/queryParams}}
-        {{^queryParams}}
-        final RequestOptions requestOptions = inputOptions.extend()
-            .withFollowLocation(followLocation)
-            .build();
-        {{/queryParams}}
-
+        {{#hasProduces}}
+        {{#produces}}
+        inputOptionsBuilder.withHeader(KillBillHttpClient.HTTP_HEADER_CONTENT_TYPE, "{{{mediaType}}}");
+        {{/produces}}
+        {{/hasProduces}}
+        {{#hasConsumes}}
+        {{#consumes}}
+        inputOptionsBuilder.withHeader(KillBillHttpClient.HTTP_HEADER_ACCEPT, "{{{mediaType}}}");
+        {{/consumes}}
+        {{/hasConsumes}}
+        final RequestOptions requestOptions = inputOptionsBuilder.build();
 
         {{#returnType}}
         {{#bodyParam}}
@@ -84,7 +89,7 @@ public class {{classname}} {
         {{/returnType}}
         {{^returnType}}
         {{#bodyParam}}
-        return httpClient.doPost(uri, {{#bodyParam}}{{paramName}}{{/bodyParam}}, {{#bodyParam}}{{{dataType}}}{{/bodyParam}}.class, requestOptions);
+        httpClient.doPost(uri, {{#bodyParam}}{{paramName}}{{/bodyParam}}, requestOptions);
         {{/bodyParam}}
         {{^bodyParam}}
         httpClient.doPost(uri, null, requestOptions);
@@ -94,7 +99,7 @@ public class {{classname}} {
 
     {{/isPost}}
     {{#isPut}}
-    public {{#bodyParam}}{{{dataType}}}{{/bodyParam}}{{^bodyParam}}void{{/bodyParam}} {{operationId}}({{#allParams}}{{^isHeaderParam}}final {{{dataType}}} {{paramName}}, {{/isHeaderParam}}{{/allParams}} final RequestOptions inputOptions) throws KillBillClientException {
+    public {{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}void{{/returnType}} {{operationId}}({{#allParams}}{{^isHeaderParam}}final {{{dataType}}} {{paramName}}, {{/isHeaderParam}}{{/allParams}} final RequestOptions inputOptions) throws KillBillClientException {
         {{#allParams}}
         {{^isHeaderParam}}
         {{#required}}
@@ -115,23 +120,40 @@ public class {{classname}} {
         queryParams.put("{{baseName}}", String.valueOf({{paramName}}));
         {{/queryParams}}
 
+        final RequestOptionsBuilder inputOptionsBuilder = inputOptions.extend();
         {{#queryParams}}
         {{#-first}}
-        final RequestOptions requestOptions = inputOptions.extend()
-            .withQueryParams(queryParams)
-            .build();
+        inputOptionsBuilder.withQueryParams(queryParams);
         {{/-first}}
         {{/queryParams}}
-        {{^queryParams}}
-        final RequestOptions requestOptions = inputOptions.extend().build();
-        {{/queryParams}}
+        {{#hasProduces}}
+        {{#produces}}
+        inputOptionsBuilder.withHeader(KillBillHttpClient.HTTP_HEADER_CONTENT_TYPE, "{{{mediaType}}}");
+        {{/produces}}
+        {{/hasProduces}}
+        {{#hasConsumes}}
+        {{#consumes}}
+        inputOptionsBuilder.withHeader(KillBillHttpClient.HTTP_HEADER_ACCEPT, "{{{mediaType}}}");
+        {{/consumes}}
+        {{/hasConsumes}}
+        final RequestOptions requestOptions = inputOptionsBuilder.build();
 
+        {{#returnType}}
         {{#bodyParam}}
-        return httpClient.doPut(uri, {{#bodyParam}}{{paramName}}{{/bodyParam}}, {{#bodyParam}}{{{dataType}}}{{/bodyParam}}.class, requestOptions);
+        return httpClient.doPut(uri, {{#bodyParam}}{{paramName}}{{/bodyParam}}, {{#returnType}}{{{returnType}}}{{/returnType}}.class, requestOptions);
         {{/bodyParam}}
         {{^bodyParam}}
-         httpClient.doPut(uri, null, requestOptions);
+        return httpClient.doPut(uri, null, {{#returnType}}{{{returnType}}}{{/returnType}}.class, requestOptions);
         {{/bodyParam}}
+        {{/returnType}}
+        {{^returnType}}
+        {{#bodyParam}}
+        httpClient.doPut(uri, {{#bodyParam}}{{paramName}}{{/bodyParam}}, requestOptions);
+        {{/bodyParam}}
+        {{^bodyParam}}
+        httpClient.doPut(uri, null, requestOptions);
+        {{/bodyParam}}
+        {{/returnType}}
     }
 
     {{/isPut}}
@@ -157,16 +179,18 @@ public class {{classname}} {
         queryParams.put("{{baseName}}", String.valueOf({{paramName}}));
         {{/queryParams}}
 
+        final RequestOptionsBuilder inputOptionsBuilder = inputOptions.extend();
         {{#queryParams}}
         {{#-first}}
-        final RequestOptions requestOptions = inputOptions.extend()
-            .withQueryParams(queryParams)
-            .build();
+        inputOptionsBuilder.withQueryParams(queryParams);
         {{/-first}}
         {{/queryParams}}
-        {{^queryParams}}
-        final RequestOptions requestOptions = inputOptions.extend().build();
-        {{/queryParams}}
+        {{#hasConsumes}}
+        {{#consumes}}
+        inputOptionsBuilder.withHeader(KillBillHttpClient.HTTP_HEADER_ACCEPT, "{{{mediaType}}}");
+        {{/consumes}}
+        {{/hasConsumes}}
+        final RequestOptions requestOptions = inputOptionsBuilder.build();
 
         httpClient.doDelete(uri, requestOptions);
     }
@@ -174,7 +198,6 @@ public class {{classname}} {
     {{/isDelete}}
     {{#isGet}}
     public {{#returnType}}{{{returnType}}} {{/returnType}}{{operationId}}({{#allParams}}{{^isHeaderParam}}final {{#isEnum}}{{{enumName}}} {{paramName}}{{/isEnum}}{{^isEnum}}{{{dataType}}} {{paramName}}{{/isEnum}}, {{/isHeaderParam}}{{/allParams}} final RequestOptions inputOptions) throws KillBillClientException {
-
         {{#allParams}}
         {{^isHeaderParam}}
         {{#required}}
@@ -195,14 +218,18 @@ public class {{classname}} {
         queryParams.put("{{baseName}}", String.valueOf({{paramName}}));
         {{/queryParams}}
 
+        final RequestOptionsBuilder inputOptionsBuilder = inputOptions.extend();
         {{#queryParams}}
         {{#-first}}
-        final RequestOptions requestOptions = inputOptions.extend().withQueryParams(queryParams).build();
+        inputOptionsBuilder.withQueryParams(queryParams);
         {{/-first}}
         {{/queryParams}}
-        {{^queryParams}}
-        final RequestOptions requestOptions = inputOptions.extend().build();
-        {{/queryParams}}
+        {{#hasProduces}}
+        {{#produces}}
+        inputOptionsBuilder.withHeader(KillBillHttpClient.HTTP_HEADER_CONTENT_TYPE, "{{{mediaType}}}");
+        {{/produces}}
+        {{/hasProduces}}
+        final RequestOptions requestOptions = inputOptionsBuilder.build();
 
         {{#returnType}}
         return httpClient.doGet(uri, {{{returnType}}}.class, requestOptions);
