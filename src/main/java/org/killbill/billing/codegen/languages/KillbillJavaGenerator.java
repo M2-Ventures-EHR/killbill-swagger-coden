@@ -1,5 +1,7 @@
 package org.killbill.billing.codegen.languages;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 import io.swagger.codegen.*;
 import io.swagger.codegen.languages.AbstractJavaCodegen;
 import io.swagger.models.Model;
@@ -163,6 +165,7 @@ public class KillbillJavaGenerator extends AbstractJavaCodegen implements Codege
 
         final List<Map<String, String>> imports = (List<Map<String, String>>) objs.get("imports");
 
+
         for (CodegenOperation op : operations) {
             final ExtendedCodegenOperation ext = new ExtendedCodegenOperation(op);
             extOperations.add(ext);
@@ -178,6 +181,8 @@ public class KillbillJavaGenerator extends AbstractJavaCodegen implements Codege
             } else if (ext.isMapContainer) {
                 addImportIfRequired(imports, "java.util.Map");
             }
+
+            final List<CodegenParameter> extendedParams = new ArrayList<>(ext.allParams.size());
             for (final CodegenParameter p : ext.allParams) {
                 if (p.isEnum) {
                     if (!p.isContainer) {
@@ -193,8 +198,9 @@ public class KillbillJavaGenerator extends AbstractJavaCodegen implements Codege
                 } else if (p.isMapContainer) {
                     addImportIfRequired(imports, "java.util.Map");
                 }
+                extendedParams.add(new ExtendedCodegenParameter(p));
             }
-
+            ext.allParams = extendedParams;
         }
         operationsMap.put("operation", extOperations);
 
@@ -244,7 +250,7 @@ public class KillbillJavaGenerator extends AbstractJavaCodegen implements Codege
 
     private static class ExtendedCodegenOperation extends CodegenOperation {
 
-        public boolean isGet, isPost, isDelete, isPut, isOptions, isKillBillObjects;
+        public boolean isGet, isPost, isDelete, isPut, isOptions, hasNonRequiredDefaultQueryParams;
 
         private ExtendedCodegenOperation(CodegenOperation o) {
             super();
@@ -306,12 +312,102 @@ public class KillbillJavaGenerator extends AbstractJavaCodegen implements Codege
             this.isDelete = "DELETE".equalsIgnoreCase(httpMethod);
             this.isOptions = "OPTIONS".equalsIgnoreCase(httpMethod);
             if ((isPost || isPut) && bodyParam != null && bodyParam.isContainer) {
-                this.isKillBillObjects = true;
                 this.bodyParam.dataType = String.format("%ss", this.bodyParam.baseType);
             }
             if (returnContainer != null && returnContainer.equals("array")) {
-                this.isKillBillObjects = true;
                 this.returnType = String.format("%ss", this.returnBaseType);
+            }
+            this.hasNonRequiredDefaultQueryParams = Iterables.any(this.queryParams, new Predicate<CodegenParameter>() {
+                @Override
+                public boolean apply(CodegenParameter input) {
+                    return !input.required && input.defaultValue != null;
+                }
+            });
+        }
+    }
+    
+    private static class ExtendedCodegenParameter extends CodegenParameter {
+
+        public boolean isMandatoryParam;
+        public String formattedDefault;
+
+        public ExtendedCodegenParameter(CodegenParameter p) {
+            this.isFile = p.isFile;
+            this.notFile = p.notFile;
+            this.hasMore = p.hasMore;
+            this.isContainer = p.isContainer;
+            this.secondaryParam = p.secondaryParam;
+            this.baseName = p.baseName;
+            this.paramName = p.paramName;
+            this.dataType = p.dataType;
+            this.datatypeWithEnum = p.datatypeWithEnum;
+            this.enumName = p.enumName;
+            this.dataFormat = p.dataFormat;
+            this.collectionFormat = p.collectionFormat;
+            this.isCollectionFormatMulti = p.isCollectionFormatMulti;
+            this.isPrimitiveType = p.isPrimitiveType;
+            this.description = p.description;
+            this.unescapedDescription = p.unescapedDescription;
+            this.baseType = p.baseType;
+            this.isFormParam = p.isFormParam;
+            this.isQueryParam = p.isQueryParam;
+            this.isPathParam = p.isPathParam;
+            this.isHeaderParam = p.isHeaderParam;
+            this.isCookieParam = p.isCookieParam;
+            this.isBodyParam = p.isBodyParam;
+            this.required = p.required;
+            this.maximum = p.maximum;
+            this.exclusiveMaximum = p.exclusiveMaximum;
+            this.minimum = p.minimum;
+            this.exclusiveMinimum = p.exclusiveMinimum;
+            this.maxLength = p.maxLength;
+            this.minLength = p.minLength;
+            this.pattern = p.pattern;
+            this.maxItems = p.maxItems;
+            this.minItems = p.minItems;
+            this.uniqueItems = p.uniqueItems;
+            this.multipleOf = p.multipleOf;
+            this.jsonSchema = p.jsonSchema;
+            this.defaultValue = p.defaultValue;
+            this.example = p.example;
+            this.isEnum = p.isEnum;
+            this._enum = p._enum;
+            this.allowableValues = p.allowableValues;
+            this.items = p.items;
+            this.vendorExtensions = p.vendorExtensions;
+            this.hasValidation = p.hasValidation;
+            this.isBinary = p.isBinary;
+            this.isByteArray = p.isByteArray;
+            this.isString = p.isString;
+            this.isNumeric = p.isNumeric;
+            this.isInteger = p.isInteger;
+            this.isLong = p.isLong;
+            this.isDouble = p.isDouble;
+            this.isFloat = p.isFloat;
+            this.isNumber = p.isNumber;
+            this.isBoolean = p.isBoolean;
+            this.isDate = p.isDate;
+            this.isDateTime = p.isDateTime;
+            this.isUuid = p.isUuid;
+            this.isListContainer = p.isListContainer;
+            this.isMapContainer = p.isMapContainer;
+            this.isMandatoryParam = !isHeaderParam && (required || (isQueryParam && defaultValue == null));
+            if (!isMandatoryParam && defaultValue != null) {
+                if (isLong) {
+                    this.formattedDefault = String.format("Long.valueOf(%s)", defaultValue);
+                } else if (isInteger) {
+                    this.formattedDefault = String.format("Integer.valueOf(%s)", defaultValue);
+                } else if (isDouble) {
+                    this.formattedDefault = String.format("Double.valueOf(%s)", defaultValue);
+                } else if (isFloat) {
+                    this.formattedDefault = String.format("Float.valueOf(%s)", defaultValue);
+                } else if (isEnum) {
+                    this.formattedDefault = String.format("%s.%s", enumName, defaultValue);
+                } else if (isBoolean) {
+                    this.formattedDefault = String.format("Boolean.valueOf(%s)", defaultValue);
+                } else {
+                    throw new IllegalStateException(String.format("FIXME: Need to implement formatted default value for type %s", baseType));
+                }
             }
         }
     }
