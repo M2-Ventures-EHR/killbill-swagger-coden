@@ -56,7 +56,9 @@ public class {{classname}} {
         {{/-first}}
         {{/queryParams}}
         {{#queryParams}}
-        queryParams.put("{{baseName}}", String.valueOf({{paramName}}));
+        if ({{paramName}} != null) {
+            queryParams.put("{{baseName}}", String.valueOf({{paramName}}));
+        }
         {{/queryParams}}
 
         final RequestOptionsBuilder inputOptionsBuilder = inputOptions.extend();
@@ -117,7 +119,9 @@ public class {{classname}} {
         {{/-first}}
         {{/queryParams}}
         {{#queryParams}}
-        queryParams.put("{{baseName}}", String.valueOf({{paramName}}));
+        if ({{paramName}} != null) {
+            queryParams.put("{{baseName}}", String.valueOf({{paramName}}));
+        }
         {{/queryParams}}
 
         final RequestOptionsBuilder inputOptionsBuilder = inputOptions.extend();
@@ -176,7 +180,9 @@ public class {{classname}} {
         {{/-first}}
         {{/queryParams}}
         {{#queryParams}}
-        queryParams.put("{{baseName}}", String.valueOf({{paramName}}));
+        if ({{paramName}} != null) {
+            queryParams.put("{{baseName}}", String.valueOf({{paramName}}));
+        }
         {{/queryParams}}
 
         final RequestOptionsBuilder inputOptionsBuilder = inputOptions.extend();
@@ -215,7 +221,9 @@ public class {{classname}} {
         {{/-first}}
         {{/queryParams}}
         {{#queryParams}}
-        queryParams.put("{{baseName}}", String.valueOf({{paramName}}));
+        if ({{paramName}} != null) {
+            queryParams.put("{{baseName}}", String.valueOf({{paramName}}));
+        }
         {{/queryParams}}
 
         final RequestOptionsBuilder inputOptionsBuilder = inputOptions.extend();

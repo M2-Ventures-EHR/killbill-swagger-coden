@@ -3,44 +3,6 @@ import org.killbill.billing.client.model.KillBillObject;
 public class {{classname}} extends KillBillObject {
 
     {{#vars}}
-    {{#jackson}}
-    @JsonProperty("{{baseName}}")
-    {{#withXml}}
-      {{^isContainer}}
-    @JacksonXmlProperty({{#isXmlAttribute}}isAttribute = true, {{/isXmlAttribute}}{{#xmlNamespace}}namespace="{{xmlNamespace}}", {{/xmlNamespace}}localName = "{{#xmlName}}{{xmlName}}{{/xmlName}}{{^xmlName}}{{baseName}}{{/xmlName}}")
-      {{/isContainer}}
-      {{#isContainer}}
-        {{#isXmlWrapped}}
-    // items.xmlName={{items.xmlName}}
-    @JacksonXmlElementWrapper(useWrapping = {{isXmlWrapped}}, {{#xmlNamespace}}namespace="{{xmlNamespace}}", {{/xmlNamespace}}localName = "{{#items.xmlName}}{{items.xmlName}}{{/items.xmlName}}{{^items.xmlName}}{{items.baseName}}{{/items.xmlName}}")
-        {{/isXmlWrapped}}
-      {{/isContainer}}
-    {{/withXml}}
-    {{/jackson}}
-    {{#withXml}}
-    {{#isXmlAttribute}}
-    @XmlAttribute(name = "{{#xmlName}}{{xmlName}}{{/xmlName}}{{^xmlName}}{{baseName}}{{/xmlName}}")
-    {{/isXmlAttribute}}
-    {{^isXmlAttribute}}
-      {{^isContainer}}
-    @XmlElement({{#xmlNamespace}}namespace="{{xmlNamespace}}", {{/xmlNamespace}}name = "{{#xmlName}}{{xmlName}}{{/xmlName}}{{^xmlName}}{{baseName}}{{/xmlName}}")
-      {{/isContainer}}
-      {{#isContainer}}
-    // Is a container wrapped={{isXmlWrapped}}
-        {{#items}}
-    // items.name={{name}} items.baseName={{baseName}} items.xmlName={{xmlName}} items.xmlNamespace={{xmlNamespace}}
-    // items.example={{example}} items.type={{datatype}}
-    @XmlElement({{#xmlNamespace}}namespace="{{xmlNamespace}}", {{/xmlNamespace}}name = "{{#xmlName}}{{xmlName}}{{/xmlName}}{{^xmlName}}{{baseName}}{{/xmlName}}")
-        {{/items}}
-        {{#isXmlWrapped}}
-    @XmlElementWrapper({{#xmlNamespace}}namespace="{{xmlNamespace}}", {{/xmlNamespace}}name = "{{#xmlName}}{{xmlName}}{{/xmlName}}{{^xmlName}}{{baseName}}{{/xmlName}}")
-        {{/isXmlWrapped}}
-      {{/isContainer}}
-    {{/isXmlAttribute}}
-    {{/withXml}}
-    {{#gson}}
-    @SerializedName("{{baseName}}")
-    {{/gson}}
     {{#isContainer}}
     private {{{datatypeWithEnum}}} {{name}}{{#required}} = {{{defaultValue}}}{{/required}}{{^required}} = null{{/required}};
     {{/isContainer}}
@@ -49,22 +11,28 @@ public class {{classname}} extends KillBillObject {
     {{/isContainer}}
 
     {{/vars}}
-    {{#gson}}
-    {{#discriminator}}
+
     public {{classname}}() {
-        this.{{discriminator}} = this.getClass().getSimpleName();
     }
-    {{/discriminator}}
-    {{/gson}}
+
+    {{#hasVars}}
+    public {{classname}}({{#vars}}final {{{datatypeWithEnum}}} {{name}}{{#hasMore}},
+                     {{/hasMore}}{{/vars}}) {
+        {{#vars}}
+        this.{{name}} = {{name}};
+        {{/vars}}
+    }
+    {{/hasVars}}
+
     {{#vars}}
     {{^isReadOnly}}
-    public {{classname}} {{name}}({{{datatypeWithEnum}}} {{name}}) {
+    public {{classname}} {{setter}}(final {{{datatypeWithEnum}}} {{name}}) {
         this.{{name}} = {{name}};
         return this;
     }
     {{#isListContainer}}
 
-    public {{classname}} add{{nameInCamelCase}}Item({{{items.datatypeWithEnum}}} {{name}}Item) {
+    public {{classname}} add{{nameInCamelCase}}Item(final {{{items.datatypeWithEnum}}} {{name}}Item) {
         {{^required}}
         if (this.{{name}} == null) {
             this.{{name}} = {{{defaultValue}}};
@@ -76,7 +44,7 @@ public class {{classname}} extends KillBillObject {
     {{/isListContainer}}
     {{#isMapContainer}}
 
-    public {{classname}} put{{nameInCamelCase}}Item(String key, {{{items.datatypeWithEnum}}} {{name}}Item) {
+    public {{classname}} put{{nameInCamelCase}}Item(final String key, final {{{items.datatypeWithEnum}}} {{name}}Item) {
         {{^required}}
         if (this.{{name}} == null) {
             this.{{name}} = {{{defaultValue}}};
@@ -88,19 +56,12 @@ public class {{classname}} extends KillBillObject {
     {{/isMapContainer}}
 
     {{/isReadOnly}}
-    {{#useBeanValidation}}{{>beanValidation}}{{/useBeanValidation}}
     {{#vendorExtensions.extraAnnotation}}
     {{{vendorExtensions.extraAnnotation}}}
     {{/vendorExtensions.extraAnnotation}}
     public {{{datatypeWithEnum}}} {{#isBoolean}}is{{/isBoolean}}{{getter}}() {
         return {{name}};
     }
-    {{^isReadOnly}}
-
-    public void {{setter}}({{{datatypeWithEnum}}} {{name}}) {
-        this.{{name}} = {{name}};
-    }
-    {{/isReadOnly}}
 
     {{/vars}}
 
@@ -121,7 +82,8 @@ public class {{classname}} extends KillBillObject {
 
     @Override
     public int hashCode() {
-        return Objects.hash({{#vars}}{{^isByteArray}}{{^isBinary}}{{name}}{{/isBinary}}{{/isByteArray}}{{#isByteArray}}Arrays.hashCode({{name}}){{/isByteArray}}{{#isBinary}}Arrays.hashCode({{name}}){{/isBinary}}{{#hasMore}}, {{/hasMore}}{{/vars}}{{#parent}}{{#hasVars}}, {{/hasVars}}super.hashCode(){{/parent}});
+        return Objects.hash({{#vars}}{{^isByteArray}}{{^isBinary}}{{name}}{{/isBinary}}{{/isByteArray}}{{#isByteArray}}Arrays.hashCode({{name}}){{/isByteArray}}{{#isBinary}}Arrays.hashCode({{name}}){{/isBinary}}{{#hasMore}},
+                            {{/hasMore}}{{/vars}}{{#parent}}{{#hasVars}}, {{/hasVars}}super.hashCode(){{/parent}});
     }
 
 
