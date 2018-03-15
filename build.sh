@@ -157,7 +157,7 @@ function write_version_file() {
   local kbVersion=`extract_version $node_info "kbVersion"`
   local kbApiVersion=`extract_version $node_info "apiVersion"`
   local kbPluginApiVersion=`extract_version $node_info "pluginApiVersion"`
-  cat >> $tmp/VERSION <<EOF
+  cat >> $tmp/KB_VERSION <<EOF
 swaggerVersion=$SWAGGER_CODEGEN_VERSION
 kbVersion=$kbVersion
 kbApiVersion=$kbApiVersion
@@ -217,7 +217,7 @@ function copy_files() {
   if [ ! -d $output/.swagger-codegen ]; then
     mkdir $output/.swagger-codegen
   fi
-  cp "$tmp/VERSION" $output/.swagger-codegen
+  cp "$tmp/KB_VERSION" $output/.swagger-codegen
 
   cp "$tmp/kbswagger.yaml" $output/.swagger-codegen
 }
@@ -242,21 +242,21 @@ while getopts ":o:i:a:l:dw" options; do
 done
 
 
-
-
-
-# Create tmp dir
-TMP=`mktemp -d`
-echo "Temp directory TMP = $TMP" >&2
-
-function cleanup {
-  rm -rf $TMP
-}
-trap cleanup EXIT
-
-
+TMP=
 # Retrieve swagger.yml spec
 if [ -z $INPUT ]; then
+
+    # Create tmp dir
+    TMP=`mktemp -d`
+    echo "Temp directory TMP = $TMP" >&2
+
+    function cleanup {
+        if [ -d $TMP ]; then
+            rm -rf $TMP
+        fi
+    }
+    trap cleanup EXIT
+
 
     # Fetch KB VERSIONS
     NODE_INFO=`kb_node_info`
@@ -265,7 +265,7 @@ if [ -z $INPUT ]; then
     write_version_file $NODE_INFO $TMP
 
     # Extract Api version
-    API_VERSION=`grep kbApiVersion "$TMP/VERSION"  | cut -d '=' -f 2`
+    API_VERSION=`grep kbApiVersion "$TMP/KB_VERSION"  | cut -d '=' -f 2`
 
     kb_swagger > "$TMP/kbswagger.yaml"
     INPUT="$TMP/kbswagger.yaml"
@@ -287,8 +287,9 @@ API_JAR=`validate_and_return_api_jar $API_VERSION`
 # Run generator
 generate_client_code $API_JAR $INPUT $LANGUAGE $OUTPUT $WAIT_DEBUGGER
 
+
 # Copy VERSION file
-if [ -z $INPUT ]; then
+if [ ! -z $TMP ]; then
     copy_files $TMP $OUTPUT
 fi
 
