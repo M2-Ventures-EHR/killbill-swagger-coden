@@ -9,7 +9,7 @@ package {{package}};
 import com.google.common.collect.Multimap;
 import com.google.common.base.Preconditions;
 import com.google.common.base.MoreObjects;
-import com.google.common.collect.HashMultimap;
+import com.google.common.collect.LinkedListMultimap;
 
 import org.killbill.billing.client.KillBillClientException;
 import org.killbill.billing.client.KillBillHttpClient;
@@ -63,13 +63,20 @@ public class {{classname}} {
 
         {{#queryParams}}
         {{#-first}}
-        final Multimap<String, String> queryParams = HashMultimap.<String, String>create(inputOptions.getQueryParams());
+        final Multimap<String, String> queryParams = LinkedListMultimap.create(inputOptions.getQueryParams());
         {{/-first}}
         {{/queryParams}}
         {{#queryParams}}
+        {{#isListContainer}}
+        if ({{paramName}} != null) {
+            queryParams.putAll("{{baseName}}", {{paramName}});
+        }
+        {{/isListContainer}}
+        {{^isListContainer}}
         if ({{paramName}} != null) {
             queryParams.put("{{baseName}}", String.valueOf({{paramName}}));
         }
+        {{/isListContainer}}
         {{/queryParams}}
 
         final RequestOptionsBuilder inputOptionsBuilder = inputOptions.extend();
@@ -137,7 +144,7 @@ public class {{classname}} {
 
         {{#queryParams}}
         {{#-first}}
-        final Multimap<String, String> queryParams = HashMultimap.<String, String>create(inputOptions.getQueryParams());
+        final Multimap<String, String> queryParams = LinkedListMultimap.create(inputOptions.getQueryParams());
         {{/-first}}
         {{/queryParams}}
         {{#queryParams}}
@@ -205,7 +212,7 @@ public class {{classname}} {
 
         {{#queryParams}}
         {{#-first}}
-        final Multimap<String, String> queryParams = HashMultimap.<String, String>create(inputOptions.getQueryParams());
+        final Multimap<String, String> queryParams = LinkedListMultimap.create(inputOptions.getQueryParams());
         {{/-first}}
         {{/queryParams}}
         {{#queryParams}}
@@ -252,7 +259,7 @@ public class {{classname}} {
 
         {{#queryParams}}
         {{#-first}}
-        final Multimap<String, String> queryParams = HashMultimap.<String, String>create(inputOptions.getQueryParams());
+        final Multimap<String, String> queryParams = LinkedListMultimap.create(inputOptions.getQueryParams());
         {{/-first}}
         {{/queryParams}}
         {{#queryParams}}
