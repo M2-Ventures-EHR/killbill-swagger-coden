@@ -1,14 +1,16 @@
 import org.killbill.billing.client.model.KillBillObject;
 
-public class {{classname}} extends KillBillObject {
+public class {{classname}} {{#parent}}extends {{parent}} {{/parent}}{
 
     {{#vars}}
+    {{^isInherited}}
     {{#isContainer}}
     private {{{datatypeWithEnum}}} {{name}}{{#required}} = {{{defaultValue}}}{{/required}}{{^required}} = null{{/required}};
     {{/isContainer}}
     {{^isContainer}}
     private {{{datatypeWithEnum}}} {{name}} = {{{defaultValue}}};
     {{/isContainer}}
+    {{/isInherited}}
 
     {{/vars}}
 
@@ -19,13 +21,24 @@ public class {{classname}} extends KillBillObject {
     public {{classname}}({{#vars}}final {{{datatypeWithEnum}}} {{name}}{{#hasMore}},
                      {{/hasMore}}{{/vars}}) {
         {{#vars}}
-        this.{{name}} = {{name}};
+        {{#isInherited}}
+        {{! HACK : only works because we have ONE such inherited var, otherwsie we need to implement the hasMore logic }}
+        super({{name}});
+        {{/isInherited}}
         {{/vars}}
+        {{#vars}}
+        {{^isInherited}}
+        this.{{name}} = {{name}};
+        {{/isInherited}}
+        {{/vars}}
+
     }
     {{/hasVars}}
 
     {{#vars}}
+    {{^isInherited}}
     {{^isReadOnly}}
+
     public {{classname}} {{setter}}(final {{{datatypeWithEnum}}} {{name}}) {
         this.{{name}} = {{name}};
         return this;
@@ -62,7 +75,7 @@ public class {{classname}} extends KillBillObject {
     public {{{datatypeWithEnum}}} {{#isBoolean}}is{{/isBoolean}}{{getter}}() {
         return {{name}};
     }
-
+    {{/isInherited}}
     {{/vars}}
 
     @Override
@@ -75,9 +88,10 @@ public class {{classname}} extends KillBillObject {
         }{{#hasVars}}
         {{classname}} {{classVarName}} = ({{classname}}) o;
         return {{#vars}}{{#isByteArray}}Arrays{{/isByteArray}}{{#isBinary}}Arrays{{/isBinary}}{{^isByteArray}}{{^isBinary}}Objects{{/isBinary}}{{/isByteArray}}.equals(this.{{name}}, {{classVarName}}.{{name}}){{#hasMore}} &&
-        {{/hasMore}}{{/vars}}{{#parent}} &&
-        super.equals(o){{/parent}};{{/hasVars}}{{^hasVars}}
-        return {{#parent}}super.equals(o){{/parent}}{{^parent}}true{{/parent}};{{/hasVars}}
+        {{/hasMore}}{{/vars}}{{/hasVars}}{{^hasVars}}
+        return true{{/hasVars}};
+
+        {{! We don't call super.equals(o) for the audit logs}}
     }
 
     @Override

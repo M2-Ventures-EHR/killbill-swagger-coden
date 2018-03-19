@@ -7,6 +7,7 @@ import io.swagger.codegen.languages.AbstractJavaCodegen;
 import io.swagger.models.Model;
 import io.swagger.models.Swagger;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.*;
 
@@ -130,12 +131,6 @@ public class KillbillJavaGenerator extends AbstractJavaCodegen implements Codege
 
     @Override
     public void preprocessSwagger(Swagger swagger) {
-        // Remove auditLogs from definitions as they will be included in our base KillBillObject
-        for (final Model m : swagger.getDefinitions().values()) {
-            if (m.getProperties() != null) {
-                m.getProperties().remove("auditLogs");
-            }
-        }
     }
 
 
@@ -152,6 +147,21 @@ public class KillbillJavaGenerator extends AbstractJavaCodegen implements Codege
 
     @Override
     public Map<String, Object> postProcessModels(Map<String, Object> objs) {
+        final List<Object> models = (List<Object>) objs.get("models");
+        for (Object entries :  models) {
+            Map<String, Object> modelTemplate = (Map<String, Object>) entries;
+            final CodegenModel m = (CodegenModel) modelTemplate.get("model");
+
+            final Iterator<CodegenProperty> it  = m.vars.iterator();
+            while (it.hasNext()) {
+                final CodegenProperty p = it.next();
+                if (p.name.equals("auditLogs")) {
+                    p.isInherited = true;
+                    m.parent = "KillBillObject";
+                    break;
+                }
+            }
+        }
         return objs;
     }
 
