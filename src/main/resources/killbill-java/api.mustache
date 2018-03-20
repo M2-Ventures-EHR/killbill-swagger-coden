@@ -148,9 +148,16 @@ public class {{classname}} {
         {{/-first}}
         {{/queryParams}}
         {{#queryParams}}
+        {{#isListContainer}}
+        if ({{paramName}} != null) {
+            queryParams.putAll("{{baseName}}", {{paramName}});
+        }
+        {{/isListContainer}}
+        {{^isListContainer}}
         if ({{paramName}} != null) {
             queryParams.put("{{baseName}}", String.valueOf({{paramName}}));
         }
+        {{/isListContainer}}
         {{/queryParams}}
 
         final RequestOptionsBuilder inputOptionsBuilder = inputOptions.extend();
@@ -216,9 +223,16 @@ public class {{classname}} {
         {{/-first}}
         {{/queryParams}}
         {{#queryParams}}
+        {{#isListContainer}}
+        if ({{paramName}} != null) {
+            queryParams.putAll("{{baseName}}", {{paramName}});
+        }
+        {{/isListContainer}}
+        {{^isListContainer}}
         if ({{paramName}} != null) {
             queryParams.put("{{baseName}}", String.valueOf({{paramName}}));
         }
+        {{/isListContainer}}
         {{/queryParams}}
 
         final RequestOptionsBuilder inputOptionsBuilder = inputOptions.extend();
@@ -263,9 +277,16 @@ public class {{classname}} {
         {{/-first}}
         {{/queryParams}}
         {{#queryParams}}
+        {{#isListContainer}}
+        if ({{paramName}} != null) {
+            queryParams.putAll("{{baseName}}", {{paramName}});
+        }
+        {{/isListContainer}}
+        {{^isListContainer}}
         if ({{paramName}} != null) {
             queryParams.put("{{baseName}}", String.valueOf({{paramName}}));
         }
+        {{/isListContainer}}
         {{/queryParams}}
 
         final RequestOptionsBuilder inputOptionsBuilder = inputOptions.extend();
