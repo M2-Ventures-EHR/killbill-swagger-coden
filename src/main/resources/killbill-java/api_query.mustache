@@ -1,0 +1,27 @@
+        {{#queryParams}}
+        {{#-first}}
+        final Multimap<String, String> queryParams = LinkedListMultimap.create(inputOptions.getQueryParams());
+        {{/-first}}
+        {{/queryParams}}
+        {{#queryParams}}
+        {{#isListContainer}}
+        if ({{paramName}} != null) {
+            {{#isEnum}}
+            queryParams.putAll("{{baseName}}", Converter.convertEnumListToStringList({{paramName}}));
+            {{/isEnum}}
+            {{^isEnum}}
+            {{#isUuid}}
+            queryParams.putAll("{{baseName}}", Converter.convertUUIDListToStringList({{paramName}}));
+            {{/isUuid}}
+            {{^isUuid}}
+            queryParams.putAll("{{baseName}}", {{paramName}});
+            {{/isUuid}}
+            {{/isEnum}}
+        }
+        {{/isListContainer}}
+        {{^isListContainer}}
+        if ({{paramName}} != null) {
+            queryParams.put("{{baseName}}", String.valueOf({{paramName}}));
+        }
+        {{/isListContainer}}
+        {{/queryParams}}

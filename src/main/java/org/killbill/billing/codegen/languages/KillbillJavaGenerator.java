@@ -192,25 +192,13 @@ public class KillbillJavaGenerator extends AbstractJavaCodegen implements Codege
                 addImportIfRequired(imports, "java.util.Map");
             }
 
-            final List<CodegenParameter> extendedParams = new ArrayList<>(ext.allParams.size());
-            for (final CodegenParameter p : ext.allParams) {
-                if (p.isEnum) {
-                    if (!p.isContainer) {
-                        final String enumImport = importMapping.get(p.datatypeWithEnum);
-                        addImportIfRequired(imports, enumImport);
-                    } else if (p.items.isEnum) {
-                        final String enumImport = importMapping.get(p.items.datatypeWithEnum);
-                        addImportIfRequired(imports, enumImport);
-                    }
-                }
-                if (p.isListContainer) {
-                    addImportIfRequired(imports, "java.util.List");
-                } else if (p.isMapContainer) {
-                    addImportIfRequired(imports, "java.util.Map");
-                }
-                extendedParams.add(new ExtendedCodegenParameter(p));
-            }
-            ext.allParams = extendedParams;
+            // Unfortunately those lists contain different objects -- so a query param from all param is really a different
+            // java object and if needed needs to be converted for each list
+            ext.allParams = convertToExtendedCodegenParam(ext.allParams, imports);
+            ext.bodyParams = convertToExtendedCodegenParam(ext.bodyParams, imports);
+            ext.pathParams = convertToExtendedCodegenParam(ext.pathParams, imports);
+            ext.queryParams = convertToExtendedCodegenParam(ext.queryParams, imports);
+            ext.formParams = convertToExtendedCodegenParam(ext.formParams, imports);
         }
         operationsMap.put("operation", extOperations);
 
@@ -218,7 +206,32 @@ public class KillbillJavaGenerator extends AbstractJavaCodegen implements Codege
     }
 
 
-    private void addImportIfRequired(final List<Map<String, String>> imports, String newImport) {
+    private List<CodegenParameter> convertToExtendedCodegenParam(final List<CodegenParameter> input, @Nullable final List<Map<String, String>> imports) {
+        final List<CodegenParameter> result = new ArrayList<>(input.size());
+        for (final CodegenParameter p : input) {
+            if (p.isEnum) {
+                if (!p.isContainer) {
+                    final String enumImport = importMapping.get(p.datatypeWithEnum);
+                    addImportIfRequired(imports, enumImport);
+                } else if (p.items.isEnum) {
+                    final String enumImport = importMapping.get(p.items.datatypeWithEnum);
+                    addImportIfRequired(imports, enumImport);
+                }
+            }
+            if (p.isListContainer) {
+                addImportIfRequired(imports, "java.util.List");
+            } else if (p.isMapContainer) {
+                addImportIfRequired(imports, "java.util.Map");
+            }
+            result.add(new ExtendedCodegenParameter(p));
+        }
+        return result;
+    }
+
+    private void addImportIfRequired(@Nullable final List<Map<String, String>> imports, String newImport) {
+        if (imports == null) {
+            return;
+        }
         for (Map<String, String> im : imports) {
             for (String i : im.values()) {
                 if (i.equals(newImport)) {
@@ -396,9 +409,9 @@ public class KillbillJavaGenerator extends AbstractJavaCodegen implements Codege
             this.isFloat = p.isFloat;
             this.isNumber = p.isNumber;
             this.isBoolean = p.isBoolean;
-            this.isDate = p.isDate;
-            this.isDateTime = p.isDateTime;
-            this.isUuid = p.isUuid;
+            this.isDate = p.isDate || (dataFormat != null && dataFormat.equalsIgnoreCase("date"));
+            this.isDateTime = p.isDateTime || (dataFormat != null && dataFormat.equalsIgnoreCase("date-time"));
+            this.isUuid = p.isUuid || (dataFormat != null && dataFormat.equalsIgnoreCase("uuid"));
             this.isListContainer = p.isListContainer;
             this.isMapContainer = p.isMapContainer;
             this.isMandatoryParam = !isHeaderParam && (required || (isQueryParam && defaultValue == null));

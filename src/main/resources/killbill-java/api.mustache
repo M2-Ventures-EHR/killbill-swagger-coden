@@ -62,29 +62,7 @@ public class {{classname}} {
         final String uri = "{{{path}}}"{{#pathParams}}
           .replaceAll("\\{" + "{{baseName}}" + "\\}", {{localVariablePrefix}}{{paramName}}.toString()){{/pathParams}};
 
-        {{#queryParams}}
-        {{#-first}}
-        final Multimap<String, String> queryParams = LinkedListMultimap.create(inputOptions.getQueryParams());
-        {{/-first}}
-        {{/queryParams}}
-        {{#queryParams}}
-        {{#isListContainer}}
-        if ({{paramName}} != null) {
-            {{#isEnum}}
-            queryParams.putAll("{{baseName}}", Converter.convertToListString({{paramName}}));
-            {{/isEnum}}
-            {{^isEnum}}
-            queryParams.putAll("{{baseName}}", {{paramName}});
-            {{/isEnum}}
-        }
-        {{/isListContainer}}
-        {{^isListContainer}}
-        if ({{paramName}} != null) {
-            queryParams.put("{{baseName}}", String.valueOf({{paramName}}));
-        }
-        {{/isListContainer}}
-        {{/queryParams}}
-
+{{>api_query}}
         final RequestOptionsBuilder inputOptionsBuilder = inputOptions.extend();
         final Boolean followLocation = MoreObjects.firstNonNull(inputOptions.getFollowLocation(), Boolean.TRUE);
         inputOptionsBuilder.withFollowLocation(followLocation);
@@ -148,29 +126,7 @@ public class {{classname}} {
         final String uri = "{{{path}}}"{{#pathParams}}
           .replaceAll("\\{" + "{{baseName}}" + "\\}", {{localVariablePrefix}}{{paramName}}.toString()){{/pathParams}};
 
-        {{#queryParams}}
-        {{#-first}}
-        final Multimap<String, String> queryParams = LinkedListMultimap.create(inputOptions.getQueryParams());
-        {{/-first}}
-        {{/queryParams}}
-        {{#queryParams}}
-        {{#isListContainer}}
-        if ({{paramName}} != null) {
-            {{#isEnum}}
-            queryParams.putAll("{{baseName}}", Converter.convertToListString({{paramName}}));
-            {{/isEnum}}
-            {{^isEnum}}
-            queryParams.putAll("{{baseName}}", {{paramName}});
-            {{/isEnum}}
-        }
-        {{/isListContainer}}
-        {{^isListContainer}}
-        if ({{paramName}} != null) {
-            queryParams.put("{{baseName}}", String.valueOf({{paramName}}));
-        }
-        {{/isListContainer}}
-        {{/queryParams}}
-
+{{>api_query}}
         final RequestOptionsBuilder inputOptionsBuilder = inputOptions.extend();
         {{#queryParams}}
         {{#-first}}
@@ -228,29 +184,7 @@ public class {{classname}} {
         final String uri = "{{{path}}}"{{#pathParams}}
           .replaceAll("\\{" + "{{baseName}}" + "\\}", {{localVariablePrefix}}{{paramName}}.toString()){{/pathParams}};
 
-        {{#queryParams}}
-        {{#-first}}
-        final Multimap<String, String> queryParams = LinkedListMultimap.create(inputOptions.getQueryParams());
-        {{/-first}}
-        {{/queryParams}}
-        {{#queryParams}}
-        {{#isListContainer}}
-        if ({{paramName}} != null) {
-            {{#isEnum}}
-            queryParams.putAll("{{baseName}}", Converter.convertToListString({{paramName}}));
-            {{/isEnum}}
-            {{^isEnum}}
-            queryParams.putAll("{{baseName}}", {{paramName}});
-            {{/isEnum}}
-        }
-        {{/isListContainer}}
-        {{^isListContainer}}
-        if ({{paramName}} != null) {
-            queryParams.put("{{baseName}}", String.valueOf({{paramName}}));
-        }
-        {{/isListContainer}}
-        {{/queryParams}}
-
+{{>api_query}}
         final RequestOptionsBuilder inputOptionsBuilder = inputOptions.extend();
         {{#queryParams}}
         {{#-first}}
@@ -287,29 +221,7 @@ public class {{classname}} {
         final String uri = "{{{path}}}"{{#pathParams}}
           .replaceAll("\\{" + "{{baseName}}" + "\\}", {{localVariablePrefix}}{{paramName}}.toString()){{/pathParams}};
 
-        {{#queryParams}}
-        {{#-first}}
-        final Multimap<String, String> queryParams = LinkedListMultimap.create(inputOptions.getQueryParams());
-        {{/-first}}
-        {{/queryParams}}
-        {{#queryParams}}
-        {{#isListContainer}}
-        if ({{paramName}} != null) {
-            {{#isEnum}}
-            queryParams.putAll("{{baseName}}", Converter.convertToListString({{paramName}}));
-            {{/isEnum}}
-            {{^isEnum}}
-            queryParams.putAll("{{baseName}}", {{paramName}});
-            {{/isEnum}}
-        }
-        {{/isListContainer}}
-        {{^isListContainer}}
-        if ({{paramName}} != null) {
-            queryParams.put("{{baseName}}", String.valueOf({{paramName}}));
-        }
-        {{/isListContainer}}
-        {{/queryParams}}
-
+{{>api_query}}
         final RequestOptionsBuilder inputOptionsBuilder = inputOptions.extend();
         {{#queryParams}}
         {{#-first}}
