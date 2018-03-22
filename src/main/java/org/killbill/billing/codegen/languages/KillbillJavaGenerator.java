@@ -4,7 +4,6 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import io.swagger.codegen.*;
 import io.swagger.codegen.languages.AbstractJavaCodegen;
-import io.swagger.models.Model;
 import io.swagger.models.Swagger;
 
 import javax.annotation.Nullable;
@@ -218,12 +217,13 @@ public class KillbillJavaGenerator extends AbstractJavaCodegen implements Codege
                     addImportIfRequired(imports, enumImport);
                 }
             }
-            if (p.isListContainer) {
+            final ExtendedCodegenParameter e = new ExtendedCodegenParameter(p);
+            if (e.isListContainer) {
                 addImportIfRequired(imports, "java.util.List");
-            } else if (p.isMapContainer) {
+            } else if (e.isMapContainer) {
                 addImportIfRequired(imports, "java.util.Map");
             }
-            result.add(new ExtendedCodegenParameter(p));
+            result.add(e);
         }
         return result;
     }
@@ -353,8 +353,15 @@ public class KillbillJavaGenerator extends AbstractJavaCodegen implements Codege
 
         public boolean isMandatoryParam;
         public String formattedDefault;
+        public boolean isQueryPluginProperty;
 
         public ExtendedCodegenParameter(CodegenParameter p) {
+            //
+            // We treat pluginProperty query params differently:
+            // Instead of generating ' List<String> pluginProperty', we generate Map<String, String> pluginProperty
+            // and some glue code to correctly serialize those as query param.
+            //
+            this.isQueryPluginProperty = p.baseName != null && p.baseName.equals("pluginProperty") && p.isQueryParam && p.isListContainer;
             this.isFile = p.isFile;
             this.notFile = p.notFile;
             this.hasMore = p.hasMore;
@@ -362,7 +369,7 @@ public class KillbillJavaGenerator extends AbstractJavaCodegen implements Codege
             this.secondaryParam = p.secondaryParam;
             this.baseName = p.baseName;
             this.paramName = p.paramName;
-            this.dataType = p.dataType;
+            this.dataType = isQueryPluginProperty ? "Map<String, String>" : p.dataType;
             this.datatypeWithEnum = p.datatypeWithEnum;
             this.enumName = p.enumName;
             this.dataFormat = p.dataFormat;
@@ -412,8 +419,8 @@ public class KillbillJavaGenerator extends AbstractJavaCodegen implements Codege
             this.isDate = p.isDate || (dataFormat != null && dataFormat.equalsIgnoreCase("date"));
             this.isDateTime = p.isDateTime || (dataFormat != null && dataFormat.equalsIgnoreCase("date-time"));
             this.isUuid = p.isUuid || (dataFormat != null && dataFormat.equalsIgnoreCase("uuid"));
-            this.isListContainer = p.isListContainer;
-            this.isMapContainer = p.isMapContainer;
+            this.isListContainer = p.isListContainer && !isQueryPluginProperty;
+            this.isMapContainer = p.isMapContainer || isQueryPluginProperty;
             this.isMandatoryParam = !isHeaderParam && (required || (isQueryParam && defaultValue == null));
             if (!isMandatoryParam && defaultValue != null) {
                 if (isLong) {

@@ -20,8 +20,17 @@
         }
         {{/isListContainer}}
         {{^isListContainer}}
+        {{#isMapContainer}}
+        {{#isQueryPluginProperty}}
+        if ({{paramName}} != null) {
+            queryParams.putAll("{{baseName}}", Converter.convertPluginPropertyMap({{paramName}}));
+        }
+        {{/isQueryPluginProperty}}
+        {{/isMapContainer}}
+        {{^isMapContainer}}
         if ({{paramName}} != null) {
             queryParams.put("{{baseName}}", String.valueOf({{paramName}}));
         }
+        {{/isMapContainer}}
         {{/isListContainer}}
         {{/queryParams}}
