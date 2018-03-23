@@ -191,6 +191,11 @@ public class {{classname}} {
         inputOptionsBuilder.withQueryParams(queryParams);
         {{/-first}}
         {{/queryParams}}
+        {{#hasProduces}}
+        {{#produces}}
+        inputOptionsBuilder.withHeader(KillBillHttpClient.HTTP_HEADER_CONTENT_TYPE, "{{{mediaType}}}");
+        {{/produces}}
+        {{/hasProduces}}
         {{#hasConsumes}}
         {{#consumes}}
         inputOptionsBuilder.withHeader(KillBillHttpClient.HTTP_HEADER_ACCEPT, "{{{mediaType}}}");
@@ -198,7 +203,12 @@ public class {{classname}} {
         {{/hasConsumes}}
         final RequestOptions requestOptions = inputOptionsBuilder.build();
 
+        {{#bodyParam}}
+        httpClient.doDelete(uri, {{#bodyParam}}{{paramName}}{{/bodyParam}}, requestOptions);
+        {{/bodyParam}}
+        {{^bodyParam}}
         httpClient.doDelete(uri, requestOptions);
+        {{/bodyParam}}
     }
 
     {{/isDelete}}
