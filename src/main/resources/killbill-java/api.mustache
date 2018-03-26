@@ -73,12 +73,12 @@ public class {{classname}} {
         {{/queryParams}}
         {{#hasProduces}}
         {{#produces}}
-        inputOptionsBuilder.withHeader(KillBillHttpClient.HTTP_HEADER_CONTENT_TYPE, "{{{mediaType}}}");
+        inputOptionsBuilder.withHeader(KillBillHttpClient.HTTP_HEADER_ACCEPT, "{{{mediaType}}}");
         {{/produces}}
         {{/hasProduces}}
         {{#hasConsumes}}
         {{#consumes}}
-        inputOptionsBuilder.withHeader(KillBillHttpClient.HTTP_HEADER_ACCEPT, "{{{mediaType}}}");
+        inputOptionsBuilder.withHeader(KillBillHttpClient.HTTP_HEADER_CONTENT_TYPE, "{{{mediaType}}}");
         {{/consumes}}
         {{/hasConsumes}}
         final RequestOptions requestOptions = inputOptionsBuilder.build();
@@ -135,12 +135,12 @@ public class {{classname}} {
         {{/queryParams}}
         {{#hasProduces}}
         {{#produces}}
-        inputOptionsBuilder.withHeader(KillBillHttpClient.HTTP_HEADER_CONTENT_TYPE, "{{{mediaType}}}");
+        inputOptionsBuilder.withHeader(KillBillHttpClient.HTTP_HEADER_ACCEPT, "{{{mediaType}}}");
         {{/produces}}
         {{/hasProduces}}
         {{#hasConsumes}}
         {{#consumes}}
-        inputOptionsBuilder.withHeader(KillBillHttpClient.HTTP_HEADER_ACCEPT, "{{{mediaType}}}");
+        inputOptionsBuilder.withHeader(KillBillHttpClient.HTTP_HEADER_CONTENT_TYPE, "{{{mediaType}}}");
         {{/consumes}}
         {{/hasConsumes}}
         final RequestOptions requestOptions = inputOptionsBuilder.build();
@@ -193,12 +193,12 @@ public class {{classname}} {
         {{/queryParams}}
         {{#hasProduces}}
         {{#produces}}
-        inputOptionsBuilder.withHeader(KillBillHttpClient.HTTP_HEADER_CONTENT_TYPE, "{{{mediaType}}}");
+        inputOptionsBuilder.withHeader(KillBillHttpClient.HTTP_HEADER_ACCEPT, "{{{mediaType}}}");
         {{/produces}}
         {{/hasProduces}}
         {{#hasConsumes}}
         {{#consumes}}
-        inputOptionsBuilder.withHeader(KillBillHttpClient.HTTP_HEADER_ACCEPT, "{{{mediaType}}}");
+        inputOptionsBuilder.withHeader(KillBillHttpClient.HTTP_HEADER_CONTENT_TYPE, "{{{mediaType}}}");
         {{/consumes}}
         {{/hasConsumes}}
         final RequestOptions requestOptions = inputOptionsBuilder.build();
@@ -240,7 +240,7 @@ public class {{classname}} {
         {{/queryParams}}
         {{#hasProduces}}
         {{#produces}}
-        inputOptionsBuilder.withHeader(KillBillHttpClient.HTTP_HEADER_CONTENT_TYPE, "{{{mediaType}}}");
+        inputOptionsBuilder.withHeader(KillBillHttpClient.HTTP_HEADER_ACCEPT, "{{{mediaType}}}");
         {{/produces}}
         {{/hasProduces}}
         final RequestOptions requestOptions = inputOptionsBuilder.build();
