@@ -40,7 +40,7 @@ public class {{classname}} {
     {{#operation}}
     {{#isPost}}
     {{#hasNonRequiredDefaultQueryParams}}
-    public {{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}void{{/returnType}} {{operationId}}({{#allParams}}{{#isMandatoryParam}}final {{#isEnum}}{{{enumName}}} {{paramName}}{{/isEnum}}{{^isEnum}}{{{dataType}}} {{paramName}}{{/isEnum}}, {{/isMandatoryParam}}{{/allParams}} final RequestOptions inputOptions) throws KillBillClientException {
+    public {{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}void{{/returnType}} {{operationId}}({{#allParams}}{{#isMandatoryParam}}final {{#isEnum}}{{{enumName}}} {{paramName}}{{/isEnum}}{{^isEnum}}{{{dataType}}} {{paramName}}{{/isEnum}}, {{/isMandatoryParam}}{{/allParams}}final RequestOptions inputOptions) throws KillBillClientException {
         {{#returnType}}
         return {{operationId}}({{#allParams}}{{^isHeaderParam}}{{#isMandatoryParam}}{{paramName}}{{/isMandatoryParam}}{{^isMandatoryParam}}{{formattedDefault}}{{/isMandatoryParam}}, {{/isHeaderParam}}{{/allParams}}inputOptions);
         {{/returnType}}
@@ -50,7 +50,7 @@ public class {{classname}} {
     }
 
     {{/hasNonRequiredDefaultQueryParams}}
-    public {{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}void{{/returnType}} {{operationId}}({{#allParams}}{{^isHeaderParam}}final {{#isEnum}}{{{enumName}}} {{paramName}}{{/isEnum}}{{^isEnum}}{{{dataType}}} {{paramName}}{{/isEnum}}, {{/isHeaderParam}}{{/allParams}} final RequestOptions inputOptions) throws KillBillClientException {
+    public {{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}void{{/returnType}} {{operationId}}({{#allParams}}{{^isHeaderParam}}final {{#isEnum}}{{{enumName}}} {{paramName}}{{/isEnum}}{{^isEnum}}{{{dataType}}} {{paramName}}{{/isEnum}}, {{/isHeaderParam}}{{/allParams}}final RequestOptions inputOptions) throws KillBillClientException {
         {{#allParams}}
         {{^isHeaderParam}}
         {{#required}}
@@ -104,7 +104,7 @@ public class {{classname}} {
     {{/isPost}}
     {{#isPut}}
     {{#hasNonRequiredDefaultQueryParams}}
-    public {{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}void{{/returnType}} {{operationId}}({{#allParams}}{{#isMandatoryParam}}final {{#isEnum}}{{{enumName}}} {{paramName}}{{/isEnum}}{{^isEnum}}{{{dataType}}} {{paramName}}{{/isEnum}}, {{/isMandatoryParam}}{{/allParams}} final RequestOptions inputOptions) throws KillBillClientException {
+    public {{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}void{{/returnType}} {{operationId}}({{#allParams}}{{#isMandatoryParam}}final {{#isEnum}}{{{enumName}}} {{paramName}}{{/isEnum}}{{^isEnum}}{{{dataType}}} {{paramName}}{{/isEnum}}, {{/isMandatoryParam}}{{/allParams}}final RequestOptions inputOptions) throws KillBillClientException {
         {{#returnType}}
         return {{operationId}}({{#allParams}}{{^isHeaderParam}}{{#isMandatoryParam}}{{paramName}}{{/isMandatoryParam}}{{^isMandatoryParam}}{{formattedDefault}}{{/isMandatoryParam}}, {{/isHeaderParam}}{{/allParams}}inputOptions);
         {{/returnType}}
@@ -114,7 +114,7 @@ public class {{classname}} {
     }
 
     {{/hasNonRequiredDefaultQueryParams}}
-    public {{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}void{{/returnType}} {{operationId}}({{#allParams}}{{^isHeaderParam}}final {{#isEnum}}{{{enumName}}} {{paramName}}{{/isEnum}}{{^isEnum}}{{{dataType}}} {{paramName}}{{/isEnum}}, {{/isHeaderParam}}{{/allParams}} final RequestOptions inputOptions) throws KillBillClientException {
+    public {{#returnType}}{{{returnType}}}{{/returnType}}{{^returnType}}void{{/returnType}} {{operationId}}({{#allParams}}{{^isHeaderParam}}final {{#isEnum}}{{{enumName}}} {{paramName}}{{/isEnum}}{{^isEnum}}{{{dataType}}} {{paramName}}{{/isEnum}}, {{/isHeaderParam}}{{/allParams}}final RequestOptions inputOptions) throws KillBillClientException {
         {{#allParams}}
         {{^isHeaderParam}}
         {{#required}}
@@ -166,13 +166,13 @@ public class {{classname}} {
     {{/isPut}}
     {{#isDelete}}
     {{#hasNonRequiredDefaultQueryParams}}
-    public void {{operationId}}({{#allParams}}{{#isMandatoryParam}}final {{#isEnum}}{{{enumName}}} {{paramName}}{{/isEnum}}{{^isEnum}}{{{dataType}}} {{paramName}}{{/isEnum}}, {{/isMandatoryParam}}{{/allParams}} final RequestOptions inputOptions) throws KillBillClientException {
+    public void {{operationId}}({{#allParams}}{{#isMandatoryParam}}final {{#isEnum}}{{{enumName}}} {{paramName}}{{/isEnum}}{{^isEnum}}{{{dataType}}} {{paramName}}{{/isEnum}}, {{/isMandatoryParam}}{{/allParams}}final RequestOptions inputOptions) throws KillBillClientException {
         {{operationId}}({{#allParams}}{{^isHeaderParam}}{{#isMandatoryParam}}{{paramName}}{{/isMandatoryParam}}{{^isMandatoryParam}}{{formattedDefault}}{{/isMandatoryParam}}, {{/isHeaderParam}}{{/allParams}}inputOptions);
     }
 
     {{/hasNonRequiredDefaultQueryParams}}
 
-    public void {{operationId}}({{#allParams}}{{^isHeaderParam}}final {{#isEnum}}{{{enumName}}} {{paramName}}{{/isEnum}}{{^isEnum}}{{{dataType}}} {{paramName}}{{/isEnum}}, {{/isHeaderParam}}{{/allParams}} final RequestOptions inputOptions) throws KillBillClientException {
+    public void {{operationId}}({{#allParams}}{{^isHeaderParam}}final {{#isEnum}}{{{enumName}}} {{paramName}}{{/isEnum}}{{^isEnum}}{{{dataType}}} {{paramName}}{{/isEnum}}, {{/isHeaderParam}}{{/allParams}}final RequestOptions inputOptions) throws KillBillClientException {
         {{#allParams}}
         {{^isHeaderParam}}
         {{#required}}
@@ -214,12 +214,12 @@ public class {{classname}} {
     {{/isDelete}}
     {{#isGet}}
     {{#hasNonRequiredDefaultQueryParams}}
-    public {{#returnType}}{{{returnType}}} {{/returnType}}{{operationId}}({{#allParams}}{{#isMandatoryParam}}final {{#isEnum}}{{{enumName}}} {{paramName}}{{/isEnum}}{{^isEnum}}{{{dataType}}} {{paramName}}{{/isEnum}}, {{/isMandatoryParam}}{{/allParams}} final RequestOptions inputOptions) throws KillBillClientException {
+    public {{#returnType}}{{{returnType}}} {{/returnType}}{{operationId}}({{#allParams}}{{#isMandatoryParam}}final {{#isEnum}}{{{enumName}}} {{paramName}}{{/isEnum}}{{^isEnum}}{{{dataType}}} {{paramName}}{{/isEnum}}, {{/isMandatoryParam}}{{/allParams}}final RequestOptions inputOptions) throws KillBillClientException {
         return {{operationId}}({{#allParams}}{{^isHeaderParam}}{{#isMandatoryParam}}{{paramName}}{{/isMandatoryParam}}{{^isMandatoryParam}}{{formattedDefault}}{{/isMandatoryParam}}, {{/isHeaderParam}}{{/allParams}}inputOptions);
     }
 
     {{/hasNonRequiredDefaultQueryParams}}
-    public {{#returnType}}{{{returnType}}} {{/returnType}}{{operationId}}({{#allParams}}{{^isHeaderParam}}final {{#isEnum}}{{{enumName}}} {{paramName}}{{/isEnum}}{{^isEnum}}{{{dataType}}} {{paramName}}{{/isEnum}}, {{/isHeaderParam}}{{/allParams}} final RequestOptions inputOptions) throws KillBillClientException {
+    public {{#returnType}}{{{returnType}}} {{/returnType}}{{operationId}}({{#allParams}}{{^isHeaderParam}}final {{#isEnum}}{{{enumName}}} {{paramName}}{{/isEnum}}{{^isEnum}}{{{dataType}}} {{paramName}}{{/isEnum}}, {{/isHeaderParam}}{{/allParams}}final RequestOptions inputOptions) throws KillBillClientException {
         {{#allParams}}
         {{^isHeaderParam}}
         {{#required}}
