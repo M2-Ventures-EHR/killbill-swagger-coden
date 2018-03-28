@@ -117,7 +117,7 @@ public class KillbillJavaGenerator extends AbstractJavaCodegen implements Codege
         importMapping.put("BigDecimal", "java.math.BigDecimal");
         importMapping.put("HashMap", "java.util.HashMap");
         importMapping.put("Map", "java.util.Map");
-
+        importMapping.put("JsonProperty", "com.fasterxml.jackson.annotation.JsonProperty");
 
         // Kill Bill API
         for (final String key : apiEnums.keySet()) {
@@ -269,7 +269,17 @@ public class KillbillJavaGenerator extends AbstractJavaCodegen implements Codege
                 model.imports.add(guessedEnumType);
             }
         }
+        if (property.isBoolean) {
+            model.imports.add("JsonProperty");
+        }
     }
+
+    @Override
+    public String toBooleanGetter(String name) {
+        // boolean properties from swagger schema are 'isXXX' and we want to leave the getter method as such.
+        return toVarName(name);
+    }
+
 
     private static class ExtendedCodegenOperation extends CodegenOperation {
 
