@@ -184,7 +184,9 @@ public class KillbillJavaGenerator extends AbstractJavaCodegen implements Codege
             if (ext.bodyParam != null && ext.bodyParam.isContainer) {
                 addImportIfRequired(imports, String.format("org.killbill.billing.client.model.%s", ext.bodyParam.dataType));
             }
-
+            if (ext.isStream) {
+                addImportIfRequired(imports, "java.io.OutputStream");
+            }
             if (ext.isListContainer) {
                 addImportIfRequired(imports, "java.util.List");
             } else if (ext.isMapContainer) {
@@ -283,7 +285,14 @@ public class KillbillJavaGenerator extends AbstractJavaCodegen implements Codege
 
     private static class ExtendedCodegenOperation extends CodegenOperation {
 
-        public boolean isGet, isPost, isDelete, isPut, isOptions, hasNonRequiredDefaultQueryParams;
+        public boolean isGet,
+                isPost,
+                isDelete,
+                isPut,
+                isOptions,
+                hasNonRequiredDefaultQueryParams,
+                isStream;
+
 
         private ExtendedCodegenOperation(CodegenOperation o) {
             super();
@@ -350,6 +359,7 @@ public class KillbillJavaGenerator extends AbstractJavaCodegen implements Codege
             if (returnContainer != null && returnContainer.equals("array")) {
                 this.returnType = String.format("%ss", this.returnBaseType);
             }
+            this.isStream = produces != null && !produces.isEmpty() && produces.get(0).get("mediaType").equals("application/octet-stream");
             this.hasNonRequiredDefaultQueryParams = Iterables.any(this.queryParams, new Predicate<CodegenParameter>() {
                 @Override
                 public boolean apply(CodegenParameter input) {
