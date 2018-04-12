@@ -30,7 +30,7 @@ Every endpoint should return -- and have correct swagger annotation to return --
 * `202`: This is returned when doing a `POST` and the processing is asynchronous
 * `204`: This is returned when the resource does not return any object -- and no way to fetch the resource object through a `Location` header.
 
-TODO: Current state of affairs with @pierre:
+This is the current list of endpoint with default successful http status:
 
 ```
 GET:
@@ -226,12 +226,15 @@ PUT:
     - bundles:renameExternalKey
     - bundles:resumeBundle
     - invoiceItems:modifyInvoiceItemCustomFields
+    - invoicePayments:completeInvoicePaymentTransaction
     - invoicePayments:modifyInvoicePaymentCustomFields
     - invoices:commitInvoice
     - invoices:modifyInvoiceCustomFields
     - invoices:voidInvoice
     - paymentMethods:modifyPaymentMethodCustomFields
     - paymentTransactions:modifyTransactionCustomFields
+    - payments:completeTransactionByExternalKey
+    - payments:completeTransaction
     - payments:modifyPaymentCustomFields
     - security:updateRoleDefinition
     - security:updateUserPassword
@@ -241,10 +244,6 @@ PUT:
     - subscriptions:modifySubscriptionCustomFields
     - subscriptions:uncancelSubscriptionPlan
     - subscriptions:undoChangeSubscriptionPlan
-  201:
-    - invoicePayments:completeInvoicePaymentTransaction
-    - payments:completeTransactionByExternalKey
-    - payments:completeTransaction
 
 DELETE:
   204:
@@ -270,7 +269,9 @@ DELETE:
     - paymentMethods:deletePaymentMethodCustomFields
     - paymentTransactions:deleteTransactionCustomFields
     - paymentTransactions:deleteTransactionTags
+    - payments:voidPaymentByExternalKey
     - payments:cancelScheduledPaymentTransactionByExternalKey
+    - payments:voidPayment
     - payments:deletePaymentCustomFields
     - payments:deletePaymentTags
     - payments:cancelScheduledPaymentTransactionById
@@ -284,10 +285,4 @@ DELETE:
     - tenants:deletePluginConfiguration
     - tenants:deletePluginPaymentStateMachineConfig
     - tenants:deleteUserKeyValue
-  201:
-    - payments:voidPaymentByExternalKey
-    - payments:voidPayment
-
 ```
-
-
