@@ -26,9 +26,9 @@ The [validate.rb](https://github.com/killbill/killbill-swagger-coden/blob/master
 
 Every endpoint should return -- and have correct swagger annotation to return -- an http status in the `2xx` range upon success. Different statuses in that range are used to indicate different things:
 * `200`: This is returned when the resource returns a response object
-* `201`: This is returned when doing a `POST` and when the ednpoint does not return a response object; instead we return an http `Location` header to specify how to fetch the created resource.
+* `201`: This is returned when doing a `POST` and when the endpoint does not return a response object; instead we return an http `Location` header to specify how to fetch the created resource.
 * `202`: This is returned when doing a `POST` and the processing is asynchronous
-* `204`: This is returned the resource does not return any object -- and no way to fetch the resource object through a `Location` header.
+* `204`: This is returned when the resource does not return any object -- and no way to fetch the resource object through a `Location` header.
 
 TODO: Current state of affairs with @pierre:
 
