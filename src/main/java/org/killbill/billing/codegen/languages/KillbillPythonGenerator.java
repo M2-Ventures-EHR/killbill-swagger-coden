@@ -1,8 +1,13 @@
 package org.killbill.billing.codegen.languages;
 
+import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 import io.swagger.codegen.*;
 import io.swagger.models.properties.*;
 import io.swagger.codegen.languages.PythonClientCodegen;
+import io.swagger.models.Swagger;
+
+import javax.annotation.Nullable;
 
 import java.util.*;
 import java.io.File;
@@ -12,6 +17,7 @@ public class KillbillPythonGenerator extends PythonClientCodegen implements Code
     // source folder where to write the files
     protected String sourceFolder = "src";
     protected String apiVersion = "1.0.0";
+    private static final String PACKAGE_NAME = "killbill";
 
     /**
      * Configures the type of generator.
@@ -46,9 +52,6 @@ public class KillbillPythonGenerator extends PythonClientCodegen implements Code
     public KillbillPythonGenerator() {
         super();
 
-        // set the output folder here
-        outputFolder = "generated-code/killbill-python";
-
         /**
          * Models.  You can write model files using the modelTemplateFiles map.
          * if you want to create one template for file, you can do so here.
@@ -75,16 +78,6 @@ public class KillbillPythonGenerator extends PythonClientCodegen implements Code
         templateDir = "killbill-python";
 
         /**
-         * Api Package.  Optional, if needed, this can be used in templates
-         */
-        apiPackage = "io.swagger.client.api";
-
-        /**
-         * Model Package.  Optional, if needed, this can be used in templates
-         */
-        modelPackage = "io.swagger.client.model";
-
-        /**
          * Reserved words.  Override this with reserved words specific to your language
          */
         reservedWords = new HashSet<String> (
@@ -99,15 +92,6 @@ public class KillbillPythonGenerator extends PythonClientCodegen implements Code
          */
         additionalProperties.put("apiVersion", apiVersion);
 
-        /**
-         * Supporting Files.  You can write single files for the generator with the
-         * entire object tree available.  If the input file has a suffix of `.mustache
-         * it will be processed by the template engine.  Otherwise, it will be copied
-         */
-//        supportingFiles.add(new SupportingFile("myFile.mustache",    // the input template or file
-//                "",                                                      // the destination folder, relative `outputFolder`
-//                "myFile.sample")                              // the output file
-//        );
 
         /**
          * Language Specific Primitives.  These types will not trigger imports by
@@ -129,23 +113,6 @@ public class KillbillPythonGenerator extends PythonClientCodegen implements Code
     @Override
     public String escapeReservedWord(String name) {
         return "_" + name;  // add an underscore to the name
-    }
-
-    /**
-     * Location to write model files.  You can use the modelPackage() as defined when the class is
-     * instantiated
-     */
-    public String modelFileFolder() {
-        return outputFolder + "/" + sourceFolder + "/" + modelPackage().replace('.', File.separatorChar);
-    }
-
-    /**
-     * Location to write api files.  You can use the apiPackage() as defined when the class is
-     * instantiated
-     */
-    @Override
-    public String apiFileFolder() {
-        return outputFolder + "/" + sourceFolder + "/" + apiPackage().replace('.', File.separatorChar);
     }
 
     /**
@@ -188,5 +155,14 @@ public class KillbillPythonGenerator extends PythonClientCodegen implements Code
         else
             type = swaggerType;
         return toModelName(type);
+    }
+
+    public void processOpts() {
+        additionalProperties.put("PACKAGE_NAME", PACKAGE_NAME);
+
+        super.processOpts();
+
+        packageName = PACKAGE_NAME;
+
     }
 }
