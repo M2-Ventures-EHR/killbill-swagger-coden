@@ -15,9 +15,10 @@ import java.io.File;
 public class KillbillPythonGenerator extends PythonClientCodegen implements CodegenConfig {
 
     // source folder where to write the files
-    protected String sourceFolder = "src";
-    protected String apiVersion = "1.0.0";
+    protected String apiVersion = "0.0.1-SNAPSHOT";
     private static final String PACKAGE_NAME = "killbill";
+    private static final String PACKAGE_VERSION = "0.0.1-SNAPSHOT";
+    private static final Boolean EXCLUDE_TESTS = true;
 
     /**
      * Configures the type of generator.
@@ -53,29 +54,11 @@ public class KillbillPythonGenerator extends PythonClientCodegen implements Code
         super();
 
         /**
-         * Models.  You can write model files using the modelTemplateFiles map.
-         * if you want to create one template for file, you can do so here.
-         * for multiple files for model, just put another entry in the `modelTemplateFiles` with
-         * a different extension
-         */
-        modelTemplateFiles.put(
-                "model.mustache", // the template to use
-                ".sample");       // the extension for each file to write
-
-        /**
-         * Api classes.  You can write classes for each Api file with the apiTemplateFiles map.
-         * as with models, add multiple entries with different extensions for multiple files per
-         * class
-         */
-        apiTemplateFiles.put(
-                "api.mustache",   // the template to use
-                ".sample");       // the extension for each file to write
-
-        /**
          * Template Location.  This is the location which templates will be read from.  The generator
          * will use the resource stream to attempt to read the templates.
          */
         templateDir = "killbill-python";
+        embeddedTemplateDir = "killbill-python";
 
         /**
          * Reserved words.  Override this with reserved words specific to your language
@@ -92,16 +75,6 @@ public class KillbillPythonGenerator extends PythonClientCodegen implements Code
          */
         additionalProperties.put("apiVersion", apiVersion);
 
-
-        /**
-         * Language Specific Primitives.  These types will not trigger imports by
-         * the client generator
-         */
-        languageSpecificPrimitives = new HashSet<String>(
-                Arrays.asList(
-                        "Type1",      // replace these with your types
-                        "Type2")
-        );
     }
 
     /**
@@ -157,12 +130,13 @@ public class KillbillPythonGenerator extends PythonClientCodegen implements Code
         return toModelName(type);
     }
 
+    @Override
     public void processOpts() {
-        additionalProperties.put("PACKAGE_NAME", PACKAGE_NAME);
+        additionalProperties.put(CodegenConstants.PACKAGE_NAME, PACKAGE_NAME);
+        additionalProperties.put(CodegenConstants.PACKAGE_VERSION, PACKAGE_VERSION);
+        additionalProperties.put(CodegenConstants.EXCLUDE_TESTS, EXCLUDE_TESTS);
 
         super.processOpts();
-
-        packageName = PACKAGE_NAME;
 
     }
 }
