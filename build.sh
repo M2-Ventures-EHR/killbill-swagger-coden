@@ -222,7 +222,7 @@ function generate_client_code() {
   local output=$4
   local wait_for_debug=$5
 
-  echo "Generating client code for language $client into $$output" >&2
+  echo "Generating client code for language $client into $output" >&2
 
   local java_debug=
   if  [ ! -z $wait_for_debug ]; then
@@ -324,9 +324,9 @@ else
     fi
 fi
 
+
 # Extract KB api artifact jar
 API_JAR=`validate_and_return_api_jar $API_VERSION`
-
 
 # Run generator
 generate_client_code $API_JAR $INPUT $LANGUAGE $OUTPUT $WAIT_DEBUGGER
