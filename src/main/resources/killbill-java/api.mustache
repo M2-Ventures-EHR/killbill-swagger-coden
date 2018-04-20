@@ -214,17 +214,13 @@ public class {{classname}} {
     {{/isDelete}}
     {{#isGet}}
     {{#hasNonRequiredDefaultQueryParams}}
-    public {{#returnType}}{{{returnType}}} {{/returnType}}{{^returnType}}void {{/returnType}}{{operationId}}({{#allParams}}{{#isMandatoryParam}}final {{#isEnum}}{{{enumName}}} {{paramName}}{{/isEnum}}{{^isEnum}}{{{dataType}}} {{paramName}}{{/isEnum}}, {{/isMandatoryParam}}{{/allParams}}{{#isStream}}final OutputStream outputStream, {{/isStream}}final RequestOptions inputOptions) throws KillBillClientException {
-        {{#returnType}}
-        return {{operationId}}({{#allParams}}{{^isHeaderParam}}{{#isMandatoryParam}}{{paramName}}{{/isMandatoryParam}}{{^isMandatoryParam}}{{formattedDefault}}{{/isMandatoryParam}}, {{/isHeaderParam}}{{/allParams}}inputOptions);
-        {{/returnType}}
-        {{^returnType}}
-        {{operationId}}({{#allParams}}{{^isHeaderParam}}{{#isMandatoryParam}}{{paramName}}{{/isMandatoryParam}}{{^isMandatoryParam}}{{formattedDefault}}{{/isMandatoryParam}}, {{/isHeaderParam}}{{/allParams}}{{#isStream}}outputStream, {{/isStream}}inputOptions);
-        {{/returnType}}
+    {{! No returntype currently implies isStream avoid checking for this as well }}
+    public {{#returnType}}{{{returnType}}} {{/returnType}}{{^returnType}}int {{/returnType}}{{operationId}}({{#allParams}}{{#isMandatoryParam}}final {{#isEnum}}{{{enumName}}} {{paramName}}{{/isEnum}}{{^isEnum}}{{{dataType}}} {{paramName}}{{/isEnum}}, {{/isMandatoryParam}}{{/allParams}}{{#isStream}}final OutputStream outputStream, {{/isStream}}final RequestOptions inputOptions) throws KillBillClientException {
+        return {{operationId}}({{#allParams}}{{^isHeaderParam}}{{#isMandatoryParam}}{{paramName}}{{/isMandatoryParam}}{{^isMandatoryParam}}{{formattedDefault}}{{/isMandatoryParam}}, {{/isHeaderParam}}{{/allParams}}{{#isStream}}outputStream, {{/isStream}}inputOptions);
     }
 
     {{/hasNonRequiredDefaultQueryParams}}
-    public {{#returnType}}{{{returnType}}} {{/returnType}}{{^returnType}}void {{/returnType}}{{operationId}}({{#allParams}}{{^isHeaderParam}}final {{#isEnum}}{{{enumName}}} {{paramName}}{{/isEnum}}{{^isEnum}}{{{dataType}}} {{paramName}}{{/isEnum}}, {{/isHeaderParam}}{{/allParams}}{{#isStream}}final OutputStream outputStream, {{/isStream}}final RequestOptions inputOptions) throws KillBillClientException {
+    public {{#returnType}}{{{returnType}}} {{/returnType}}{{^returnType}}int {{/returnType}}{{operationId}}({{#allParams}}{{^isHeaderParam}}final {{#isEnum}}{{{enumName}}} {{paramName}}{{/isEnum}}{{^isEnum}}{{{dataType}}} {{paramName}}{{/isEnum}}, {{/isHeaderParam}}{{/allParams}}{{#isStream}}final OutputStream outputStream, {{/isStream}}final RequestOptions inputOptions) throws KillBillClientException {
         {{#allParams}}
         {{^isHeaderParam}}
         {{#required}}
@@ -254,7 +250,8 @@ public class {{classname}} {
         return httpClient.doGet(uri, {{{returnType}}}.class, requestOptions);
         {{/returnType}}
         {{^returnType}}
-        httpClient.doGet(uri, outputStream, requestOptions);
+        final Response response = httpClient.doGet(uri, outputStream, requestOptions);
+        return response.getStatusCode();
         {{/returnType}}
     }
 

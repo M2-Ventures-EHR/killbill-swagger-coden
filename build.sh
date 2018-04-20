@@ -92,19 +92,33 @@ fi
 ###############################################################################
 
 function usage() {
-  echo "> ./build.sh -l <language> -o <output> [-d] [-w] " >&2
+  echo "> ./build.sh -l <language> -o <output> []-v] [-d] [-w] " >&2
   echo "" >&2
-  echo "# Example to generate code for java and wait for java debugger to start on port 5005: " >&2
-  echo "> ./build.sh -l killbill-java -o ../killbill-client-java -w" >&2
+  echo "# Example to generate code for java, run validation, and wait for java debugger to start on port 5005: " >&2
+  echo "> ./build.sh -l killbill-java -o ../killbill-client-java -v -w" >&2
   echo "" >&2
   echo "# Example to generate code from input file and api version " >&2
   echo "> ./build.sh -l killbill-java -o ../killbill-client-java -i <swagger.yaml> -a <killbill_api_version>" >&2
   exit 1
 }
 
+function curl_with_err() {
+  $CURL --fail --silent "$@"
+  local ret=$?
+  if [ $ret -ne 0 ]; then
+    if [ $ret -eq 7 ]; then
+        echo "CURL: Fail to connect to host " >&2
+    else
+        echo "CURL: Failed " >&2
+    fi
+    echo "EXIT...... " >&2
+    exit 1
+  fi
+}
+
 
 function kb_curl() {
-  $CURL --fail --silent -u $KB_USER_CREDS "$@"
+  curl_with_err -u $KB_USER_CREDS "$@"
   local ret=$?
   if [ $ret -ne 0 ]; then
     if [ $ret -eq 7 ]; then
@@ -135,8 +149,31 @@ function kb_node_info() {
 }
 
 function kb_swagger() {
+  local format=$1
   kb_api \
-    "$KILLBILL_BASE_URL/swagger.yaml"
+    "$KILLBILL_BASE_URL/swagger.$format"
+}
+
+function validate_schema() {
+  local tmp=$1
+  local output="$tmp/swagger_validation.json"
+  
+  kb_swagger 'json' > "$tmp/swagger.json"
+  curl_with_err \
+        -X POST \
+        -d @/tmp/swagger.json \
+        -H 'Content-Type:application/json' \
+        -o $output \
+        http://online.swagger.io/validator/debug
+  
+  r=`cat $output | jq '.schemaValidationMessages'`
+  
+  if [ $r == "null" ]; then
+    echo "*** Schema Validation Successful ! ";
+  else
+    echo "*** Schema Validation Failed ! "
+    cat $output
+  fi
 }
 
 
@@ -185,7 +222,7 @@ function generate_client_code() {
   local output=$4
   local wait_for_debug=$5
 
-  echo "Generating client code for language $client into $$output" >&2
+  echo "Generating client code for language $client into $output" >&2
 
   local java_debug=
   if  [ ! -z $wait_for_debug ]; then
@@ -229,12 +266,13 @@ function copy_files() {
 ###############################################################################
 
 
-while getopts ":o:i:a:l:dw" options; do
+while getopts ":o:i:a:l:vdw" options; do
   case $options in
         w ) WAIT_DEBUGGER=1;;
+        v ) VALIDATE_SCHEMA=1;;
         o ) OUTPUT=$OPTARG;;
         l ) LANGUAGE=$OPTARG;;
-        i ) INPUT=$OPTARG;;
+        i ) INPUT=$OPTARG;;        
         a ) API_VERSION=$OPTARG;;
     h ) usage;;
     * ) usage;;
@@ -267,8 +305,14 @@ if [ -z $INPUT ]; then
     # Extract Api version
     API_VERSION=`grep kbApiVersion "$TMP/KB_VERSION"  | cut -d '=' -f 2`
 
-    kb_swagger > "$TMP/kbswagger.yaml"
+    # Validate schema
+    if [ ! -z $VALIDATE_SCHEMA ]; then
+      validate_schema $TMP
+    fi
+
+    kb_swagger "yaml" > "$TMP/kbswagger.yaml"
     INPUT="$TMP/kbswagger.yaml"
+    
 else
     if [ ! -f $INPUT ]; then
        echo "Abort: Cannot find swagger spec $INPUT  " >&2
@@ -280,9 +324,9 @@ else
     fi
 fi
 
+
 # Extract KB api artifact jar
 API_JAR=`validate_and_return_api_jar $API_VERSION`
-
 
 # Run generator
 generate_client_code $API_JAR $INPUT $LANGUAGE $OUTPUT $WAIT_DEBUGGER

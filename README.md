@@ -102,6 +102,25 @@ The code generation has been limited to generating model and api files, but at t
 
 The generated code has been check-in in the existing Kill Bill [client java repo](https://github.com/killbill/killbill-client-java), but in a branch called `swagger-gen`. Note that, at this point this is still an experiment, and we don't know whether this branch will eventually be merged.
 
+## Python
 
+There is a new swagger module called `killbill-python`, that is used to generate the python client library.
+
+* [KillbillPythonGenerator](https://github.com/killbill/killbill-swagger-coden/blob/master/src/main/java/org/killbill/billing/codegen/languages/KillbillPythonGenerator.java)
+* [killbill-python](https://github.com/killbill/killbill-swagger-coden/tree/master/src/main/resources/killbill-python) templates.
+
+
+To generate the client enter the following command:
+```sh
+> ./build.sh -l killbill-python -o ../killbill-client-python
+```
+Note: If you don't want to generate the API docs, tests, and `git_push.hs` file just create a file named `.swagger-codegen-ignore` in the output directory.
+with the following:
+```
+docs/*.md
+test/*
+git_push.sh
+```
+[Reff: How to skip certain files during code generation?](https://github.com/swagger-api/swagger-codegen/wiki/FAQ#how-to-skip-certain-files-during-code-generation)
 
 

@@ -29,6 +29,9 @@ public class KillbillJavaGenerator extends AbstractJavaCodegen implements Codege
 
     private static final String DATE_LIBRARY_JODA = "joda";
 
+    // Keep track of all visited Reference Models
+    private static Set<String> ALL_MODELS = new HashSet<>();
+
     /**
      * Configures the type of generator.
      *
@@ -144,12 +147,15 @@ public class KillbillJavaGenerator extends AbstractJavaCodegen implements Codege
         throw new IllegalStateException("Cannot find enum with first value " + firstEnumValue);
     }
 
+
     @Override
     public Map<String, Object> postProcessModels(Map<String, Object> objs) {
         final List<Object> models = (List<Object>) objs.get("models");
         for (Object entries :  models) {
             Map<String, Object> modelTemplate = (Map<String, Object>) entries;
             final CodegenModel m = (CodegenModel) modelTemplate.get("model");
+
+            ALL_MODELS.add(m.name);
 
             final Iterator<CodegenProperty> it  = m.vars.iterator();
             while (it.hasNext()) {
@@ -178,14 +184,15 @@ public class KillbillJavaGenerator extends AbstractJavaCodegen implements Codege
         for (CodegenOperation op : operations) {
             final ExtendedCodegenOperation ext = new ExtendedCodegenOperation(op);
             extOperations.add(ext);
-            if (ext.returnType != null && ext.isListContainer) {
+            if (ext.isReturnModelRefContainer) {
                 addImportIfRequired(imports, String.format("org.killbill.billing.client.model.%s", ext.returnType));
             }
-            if (ext.bodyParam != null && ext.bodyParam.isContainer) {
+            if (ext.isBodyModelRefContainer) {
                 addImportIfRequired(imports, String.format("org.killbill.billing.client.model.%s", ext.bodyParam.dataType));
             }
             if (ext.isStream) {
                 addImportIfRequired(imports, "java.io.OutputStream");
+                addImportIfRequired(imports, "com.ning.http.client.Response");
             }
             if (ext.isListContainer) {
                 addImportIfRequired(imports, "java.util.List");
@@ -290,6 +297,8 @@ public class KillbillJavaGenerator extends AbstractJavaCodegen implements Codege
                 isDelete,
                 isPut,
                 isOptions,
+                isReturnModelRefContainer,
+                isBodyModelRefContainer,
                 hasNonRequiredDefaultQueryParams,
                 isStream;
 
@@ -353,10 +362,24 @@ public class KillbillJavaGenerator extends AbstractJavaCodegen implements Codege
             this.isPut = "PUT".equalsIgnoreCase(httpMethod);
             this.isDelete = "DELETE".equalsIgnoreCase(httpMethod);
             this.isOptions = "OPTIONS".equalsIgnoreCase(httpMethod);
-            if ((isPost || isPut) && bodyParam != null && bodyParam.isContainer) {
+            // Body is a List of Reference Model
+            this.isBodyModelRefContainer = (isPost || isPut) &&
+                    bodyParam != null && bodyParam.isContainer && bodyParam.baseType != null &&
+                    ALL_MODELS.contains(bodyParam.baseType);
+            if (isBodyModelRefContainer) {
                 this.bodyParam.dataType = String.format("%ss", this.bodyParam.baseType);
             }
-            if (returnContainer != null && returnContainer.equals("array")) {
+
+            // Return value is a List of Reference Model
+            // Actually here, we need to create special types for primitive types as well:
+            // e.g we want to generate: return doGet(uri, DateTimes.class, requestOptions);
+            //     and not: return doGet(uri, List<DateTime>.class, requestOptions);
+            // => So we don't restrict with ALL_MODELS.contains(this.returnBaseType);
+            this.isReturnModelRefContainer = returnContainer != null &&
+                    //ALL_MODELS.contains(this.returnBaseType) &&
+                    returnContainer.equals("array") && this.returnBaseType != null;
+
+            if (isReturnModelRefContainer) {
                 this.returnType = String.format("%ss", this.returnBaseType);
             }
             this.isStream = produces != null && !produces.isEmpty() && produces.get(0).get("mediaType").equals("application/octet-stream");
