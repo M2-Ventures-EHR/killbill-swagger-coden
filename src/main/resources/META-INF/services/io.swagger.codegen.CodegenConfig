@@ -1,1 +1,2 @@
 org.killbill.billing.codegen.languages.KillbillJavaGenerator
+org.killbill.billing.codegen.languages.KillbillPythonGenerator
