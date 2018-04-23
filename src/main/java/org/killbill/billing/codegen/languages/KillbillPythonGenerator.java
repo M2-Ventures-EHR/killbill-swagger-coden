@@ -139,4 +139,26 @@ public class KillbillPythonGenerator extends PythonClientCodegen implements Code
         super.processOpts();
 
     }
+
+    @Override
+    public void postProcessParameter(CodegenParameter parameter){
+        parameter.paramName = deletePrefix(parameter.paramName);
+        postProcessPattern(parameter.pattern, parameter.vendorExtensions);
+    }
+
+    @Override
+    public Map<String, Object> postProcessModels(Map<String, Object> objs) {
+        // process enum in models
+        return postProcessModelsEnum(objs);
+    }
+
+    // Remove 'x_killbill_' prefix
+    private String deletePrefix(String param){
+
+        String str = "x_killbill_";
+        if(param.contains(str)){
+            param = param.replace(str, "");
+        }
+        return param;
+    }
 }
