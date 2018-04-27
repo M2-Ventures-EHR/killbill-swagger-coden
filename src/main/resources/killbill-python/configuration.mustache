@@ -38,7 +38,7 @@ class Configuration(six.with_metaclass(TypeWithDefault, object)):
     def __init__(self):
         """Constructor"""
         # Default Base url
-        self.host = "{{{basePath}}}"
+        self.host = "http://localhost:8080"
         # Temp file folder for downloading files
         self.temp_folder_path = None
 
@@ -48,9 +48,9 @@ class Configuration(six.with_metaclass(TypeWithDefault, object)):
         # dict to store API prefix (e.g. Bearer)
         self.api_key_prefix = {}
         # Username for HTTP basic authentication
-        self.username = ""
+        self.username = "admin"
         # Password for HTTP basic authentication
-        self.password = ""
+        self.password = "password"
 {{#authMethods}}{{#isOAuth}}
         # access token for OAuth
         self.access_token = ""

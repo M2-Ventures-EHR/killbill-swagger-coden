@@ -4,7 +4,7 @@
 
 {{>copyright}}
 
-{{>partial_header}}
+from __future__ import absolute_import
 
 base_uri = 'http://localhost:8080'
 username = 'admin'
@@ -13,10 +13,10 @@ api_key = 'bob'
 api_secret = 'lazar'
 
 try:
-import json
+    import json
 except ImportError:
 # Python 2.5 compatibility (import your own json module, e.g. killbill.json=simplejson)
-pass
+    pass
 
 # Custom urllib opener, e.g.:
 #   from killbill.grinder_http_handler import GrinderHTTPHandler
@@ -26,8 +26,6 @@ opener = None
 import logging
 
 logging.basicConfig(level=logging.DEBUG)
-
-from __future__ import absolute_import
 
 # import apis into sdk package
 {{#apiInfo}}{{#apis}}from {{apiPackage}}.{{classVarName}} import {{classname}}
