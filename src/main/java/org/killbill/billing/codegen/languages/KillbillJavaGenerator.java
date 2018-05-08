@@ -1,6 +1,8 @@
 package org.killbill.billing.codegen.languages;
 
 import com.google.common.base.Predicate;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import io.swagger.codegen.*;
 import io.swagger.codegen.languages.AbstractJavaCodegen;
@@ -122,6 +124,9 @@ public class KillbillJavaGenerator extends AbstractJavaCodegen implements Codege
         importMapping.put("Map", "java.util.Map");
         importMapping.put("JsonProperty", "com.fasterxml.jackson.annotation.JsonProperty");
 
+        // So as to not generate Entity
+        importMapping.put("Entity", "org.killbill.billing.client.model.gen");
+
         // Kill Bill API
         for (final String key : apiEnums.keySet()) {
             importMapping.put(key, apiEnums.get(key).getName().replaceAll("\\$", "."));
@@ -154,19 +159,35 @@ public class KillbillJavaGenerator extends AbstractJavaCodegen implements Codege
         for (Object entries :  models) {
             Map<String, Object> modelTemplate = (Map<String, Object>) entries;
             final CodegenModel m = (CodegenModel) modelTemplate.get("model");
-
-            ALL_MODELS.add(m.name);
+            if (m.name.equals("Entity")) {
+                return ImmutableMap.of();
+            }
 
             final Iterator<CodegenProperty> it  = m.vars.iterator();
-            while (it.hasNext()) {
-                final CodegenProperty p = it.next();
-                if (p.name.equals("auditLogs")) {
-                    p.isInherited = true;
-                    m.parent = "KillBillObject";
-                    break;
+            if (m.name.equals("AuditLog")) {
+                m.vendorExtensions.put("x-entity-generic", true);
+                while (it.hasNext()) {
+                    final CodegenProperty p = it.next();
+                    if (p.name.equals("history")) {
+                        p.vendorExtensions.put("x-entity-generic", true);
+                        m.imports.remove("Entity");
+                        break;
+                    }
+                }
+            } else {
+                while (it.hasNext()) {
+                    final CodegenProperty p = it.next();
+                    if (p.name.equals("auditLogs")) {
+                        p.isInherited = true;
+                        m.parent = "KillBillObject";
+                        break;
+                    }
                 }
             }
+
+           ALL_MODELS.add(m.name);
         }
+
         return objs;
     }
 

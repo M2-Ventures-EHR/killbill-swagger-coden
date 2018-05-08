@@ -1,6 +1,6 @@
 import org.killbill.billing.client.model.KillBillObject;
 
-public class {{classname}} {{#parent}}extends {{parent}} {{/parent}}{
+public class {{classname}}{{#vendorExtensions.x-entity-generic}}<E>{{/vendorExtensions.x-entity-generic}} {{#parent}}extends {{parent}} {{/parent}}{
 
     {{#vars}}
     {{^isInherited}}
@@ -8,7 +8,12 @@ public class {{classname}} {{#parent}}extends {{parent}} {{/parent}}{
     private {{{datatypeWithEnum}}} {{name}}{{#required}} = {{{defaultValue}}}{{/required}}{{^required}} = null{{/required}};
     {{/isContainer}}
     {{^isContainer}}
+    {{#vendorExtensions.x-entity-generic}}
+    private E {{name}} = {{{defaultValue}}};
+    {{/vendorExtensions.x-entity-generic}}
+    {{^vendorExtensions.x-entity-generic}}
     private {{{datatypeWithEnum}}} {{name}} = {{{defaultValue}}};
+    {{/vendorExtensions.x-entity-generic}}
     {{/isContainer}}
     {{/isInherited}}
 
@@ -18,7 +23,7 @@ public class {{classname}} {{#parent}}extends {{parent}} {{/parent}}{
     }
 
     {{#hasVars}}
-    public {{classname}}({{#vars}}final {{{datatypeWithEnum}}} {{name}}{{#hasMore}},
+    public {{classname}}({{#vars}}final {{#vendorExtensions.x-entity-generic}}E{{/vendorExtensions.x-entity-generic}}{{^vendorExtensions.x-entity-generic}}{{{datatypeWithEnum}}}{{/vendorExtensions.x-entity-generic}} {{name}}{{#hasMore}},
                      {{/hasMore}}{{/vars}}) {
         {{#vars}}
         {{#isInherited}}
@@ -39,7 +44,7 @@ public class {{classname}} {{#parent}}extends {{parent}} {{/parent}}{
     {{^isInherited}}
     {{^isReadOnly}}
 
-    public {{classname}} {{setter}}(final {{{datatypeWithEnum}}} {{name}}) {
+    public {{classname}} {{setter}}(final {{#vendorExtensions.x-entity-generic}}E{{/vendorExtensions.x-entity-generic}}{{^vendorExtensions.x-entity-generic}}{{{datatypeWithEnum}}}{{/vendorExtensions.x-entity-generic}} {{name}}) {
         this.{{name}} = {{name}};
         return this;
     }
@@ -75,7 +80,7 @@ public class {{classname}} {{#parent}}extends {{parent}} {{/parent}}{
     {{#isBoolean}}
     @JsonProperty(value="{{getter}}")
     {{/isBoolean}}
-    public {{{datatypeWithEnum}}} {{getter}}() {
+    public {{#vendorExtensions.x-entity-generic}}E{{/vendorExtensions.x-entity-generic}}{{^vendorExtensions.x-entity-generic}}{{{datatypeWithEnum}}}{{/vendorExtensions.x-entity-generic}} {{getter}}() {
         return {{name}};
     }
     {{/isInherited}}
