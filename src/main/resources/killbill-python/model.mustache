@@ -10,7 +10,6 @@ import re  # noqa: F401
 import six
 {{#imports}}{{#-first}}
 {{/-first}}
-{{import}}  # noqa: F401,E501
 {{/imports}}
 
 
@@ -99,10 +98,7 @@ class {{classname}}(object):
         :param {{name}}: The {{name}} of this {{classname}}.  # noqa: E501
         :type: {{datatype}}
         """
-{{#required}}
-        if {{name}} is None:
-            raise ValueError("Invalid value for `{{name}}`, must not be `None`")  # noqa: E501
-{{/required}}
+
 {{#isEnum}}
 {{#isContainer}}
         allowed_values = [{{#allowableValues}}{{#values}}{{#items.isString}}"{{/items.isString}}{{{this}}}{{#items.isString}}"{{/items.isString}}{{^-last}}, {{/-last}}{{/values}}{{/allowableValues}}]  # noqa: E501
@@ -124,12 +120,6 @@ class {{classname}}(object):
 {{/isMapContainer}}
 {{/isContainer}}
 {{^isContainer}}
-        allowed_values = [{{#allowableValues}}{{#values}}{{#isString}}"{{/isString}}{{{this}}}{{#isString}}"{{/isString}}{{^-last}}, {{/-last}}{{/values}}{{/allowableValues}}]  # noqa: E501
-        if {{{name}}} not in allowed_values:
-            raise ValueError(
-                "Invalid value for `{{{name}}}` ({0}), must be one of {1}"  # noqa: E501
-                .format({{{name}}}, allowed_values)
-            )
 {{/isContainer}}
 {{/isEnum}}
 {{^isEnum}}
