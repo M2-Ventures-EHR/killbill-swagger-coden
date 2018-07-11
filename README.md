@@ -28,7 +28,7 @@ which can be used to submit PRs for that purpose.
 Note that there is some usefull information about annotations in these pages.
 
 * [github wiki](https://github.com/swagger-api/swagger-core/wiki/Annotations-1.5.X)
-* [wagger doc](https://swagger.io/docs/specification/2-0/)
+* [swagger doc](https://swagger.io/docs/specification/2-0/)
 
 
 ## Using the generator
