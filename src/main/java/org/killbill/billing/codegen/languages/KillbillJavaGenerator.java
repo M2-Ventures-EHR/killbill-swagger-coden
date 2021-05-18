@@ -213,7 +213,7 @@ public class KillbillJavaGenerator extends AbstractJavaCodegen implements Codege
             }
             if (ext.isStream) {
                 addImportIfRequired(imports, "java.io.OutputStream");
-                addImportIfRequired(imports, "com.ning.http.client.Response");
+                addImportIfRequired(imports, "org.asynchttpclient.Response");
             }
             if (ext.isListContainer) {
                 addImportIfRequired(imports, "java.util.List");
