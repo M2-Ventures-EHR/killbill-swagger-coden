@@ -21,9 +21,6 @@ Note that we can also export yam using:
 curl http://127.0.0.1:8080/swagger.yaml > ./kbswagger.yaml 
 ```
 
-While generating the client code, it is possible that some of the annotations are missing or incorrect, leading to incorrect generation
-and so in this case, such (server) annotations should be modified. There is a special Kill Bill branch, `work-for-release-0.19.x-doc`,
-which can be used to submit PRs for that purpose.
 
 Note that there is some usefull information about annotations in these pages.
 
@@ -31,9 +28,18 @@ Note that there is some usefull information about annotations in these pages.
 * [swagger doc](https://swagger.io/docs/specification/2-0/)
 
 
+
 ## Using the generator
 
-**Pre-requisite:** Read the [swagger README](https://github.com/swagger-api/swagger-codegen/blob/master/README.md) to install the binary and get some understanding on how things work.
+**Pre-requisite:** Read the [swagger README](https://github.com/swagger-api/swagger-codegen/blob/master/README.md) to install the binary and get some understanding on how things work. The generator relies on `swagger-codegen` version `2.4.1`. In order to dowload the `swagger-codegen-cli` required by the `build.sh` script, you can run the following:
+
+
+```
+mvn org.apache.maven.plugins:maven-dependency-plugin:2.8:get \
+    -Dartifact=io.swagger:swagger-codegen-cli:2.4.1
+```
+
+Note that upgrading to `2.4.19`, latest patch version at the time of this writing led to incorrect code generation -- no further investigation was done, perhaps an easy fix -- but until we investigate we are stuck on this version.
 
 
 The standard command to generate the code for `java` would be:
