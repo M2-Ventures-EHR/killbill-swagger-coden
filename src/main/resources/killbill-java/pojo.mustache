@@ -95,19 +95,18 @@ public class {{classname}}{{#vendorExtensions.x-entity-generic}}<E>{{/vendorExte
             return false;
         }{{#hasVars}}
         {{classname}} {{classVarName}} = ({{classname}}) o;
-        return {{#vars}}{{#isByteArray}}Arrays{{/isByteArray}}{{#isBinary}}Arrays{{/isBinary}}{{^isByteArray}}{{^isBinary}}Objects{{/isBinary}}{{/isByteArray}}.equals(this.{{name}}, {{classVarName}}.{{name}}){{#hasMore}} &&
-        {{/hasMore}}{{/vars}}{{/hasVars}}{{^hasVars}}
-        return true{{/hasVars}};
-
-        {{! We don't call super.equals(o) for the audit logs}}
+        return {{#vars}}{{^vendorExtensions.x-ignore-for-identity}}Objects.equals(this.{{name}}, {{classVarName}}.{{name}}){{/vendorExtensions.x-ignore-for-identity}}{{#vendorExtensions.x-ignore-for-identity}}true /* ignoring this.{{name}} for identity operations */{{/vendorExtensions.x-ignore-for-identity}}{{#hasMore}} &&
+            {{/hasMore}}{{/vars}}{{^vendorExtensions.x-ignore-super-for-identity}}{{#parent}} &&
+            super.equals(o){{/parent}}{{/vendorExtensions.x-ignore-super-for-identity}};{{/hasVars}}{{^hasVars}}
+        return true;{{/hasVars}}
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash({{#vars}}{{^isByteArray}}{{^isBinary}}{{name}}{{/isBinary}}{{/isByteArray}}{{#isByteArray}}Arrays.hashCode({{name}}){{/isByteArray}}{{#isBinary}}Arrays.hashCode({{name}}){{/isBinary}}{{#hasMore}},
-                            {{/hasMore}}{{/vars}}{{#parent}}{{#hasVars}}, {{/hasVars}}super.hashCode(){{/parent}});
+        return Objects.hash({{#vars}}{{^vendorExtensions.x-ignore-for-identity}}{{name}}{{/vendorExtensions.x-ignore-for-identity}}{{#vendorExtensions.x-ignore-for-identity}}0 /* ignoring {{name}} for identity operations */ {{/vendorExtensions.x-ignore-for-identity}}{{#hasMore}},
+            {{/hasMore}}{{/vars}}{{^vendorExtensions.x-ignore-super-for-identity}}{{#parent}}{{#hasVars}},
+            {{/hasVars}}super.hashCode(){{/parent}}{{/vendorExtensions.x-ignore-super-for-identity}});
     }
-
 
     @Override
     public String toString() {

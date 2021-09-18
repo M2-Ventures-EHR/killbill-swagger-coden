@@ -180,6 +180,8 @@ public class KillbillJavaGenerator extends AbstractJavaCodegen implements Codege
                     if (p.name.equals("auditLogs")) {
                         p.isInherited = true;
                         m.parent = "KillBillObject";
+                        p.vendorExtensions.put("x-ignore-for-identity", true);
+                        m.vendorExtensions.put("x-ignore-super-for-identity", true);
                         break;
                     }
                 }
