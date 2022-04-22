@@ -16,13 +16,13 @@ The swagger schema can be obtained by hitting a running instance of Kill Bill:
 curl http://127.0.0.1:8080/swagger.json > ./kbswagger.json 
 ```
 
-Note that we can also export yam using:
+Note that we can also export yaml using:
 ```
 curl http://127.0.0.1:8080/swagger.yaml > ./kbswagger.yaml 
 ```
 
 
-Note that there is some usefull information about annotations in these pages.
+Note that there is some useful information about annotations in these pages.
 
 * [github wiki](https://github.com/swagger-api/swagger-core/wiki/Annotations-1.5.X)
 * [swagger doc](https://swagger.io/docs/specification/2-0/)
@@ -31,7 +31,7 @@ Note that there is some usefull information about annotations in these pages.
 
 ## Using the generator
 
-**Pre-requisite:** Read the [swagger README](https://github.com/swagger-api/swagger-codegen/blob/master/README.md) to install the binary and get some understanding on how things work. The generator relies on `swagger-codegen` version `2.4.1`. In order to dowload the `swagger-codegen-cli` required by the `build.sh` script, you can run the following:
+**Pre-requisite:** Read the [swagger README](https://github.com/swagger-api/swagger-codegen/blob/master/README.md) to install the binary and get some understanding on how things work. The generator relies on `swagger-codegen` version `2.4.1`. In order to download the `swagger-codegen-cli` required by the `build.sh` script, you can run the following (This downloads the `swagger-codegen-cli` jar file to the local Maven repo) :
 
 
 ```
@@ -56,7 +56,7 @@ swagger-codegen  generate \
 ```
 
 
-However, to simplify things one can use the `build.sh` script:
+However, to simplify things one can use the `build.sh` script (On Windows, you can use [Git Bash](https://git-scm.com/download/win) to run this script):
 
 * The script will retrieve the KB version (requires a running instance of Kill Bill)
 * The script will retrieve the swagger spec (requires a running instance of Kill Bill)
@@ -87,7 +87,7 @@ The code customization allows for the following:
 
 In addition to code customization, we can also define our own Mustache templates to generate the client code we want to have.
 
-Modifiying the generator, including the Mustache template would require building the repo: `mvn -DskipTests=true -Dmaven.javadoc.skip=true install`
+Modifying the generator, including the Mustache template would require building the repo: `mvn -DskipTests=true -Dmaven.javadoc.skip=true install`
 
 So, in summary, the `kbswagger.json` input along with the custom code and templates provide a flexible way to generate client libraries in any language.
 
