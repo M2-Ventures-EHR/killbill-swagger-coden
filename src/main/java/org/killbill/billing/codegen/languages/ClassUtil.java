@@ -19,9 +19,9 @@ public class ClassUtil {
         try {
             File file = new File(apiJar);
             URL[] urls = new URL[1];
-            urls[0] = new URL(String.format("file://%s", apiJar));
+            urls[0] = new URL(String.format("file:///%s", apiJar)); //Changed to file:/// to support Windows
             final URLClassLoader cl = new URLClassLoader(urls);
-
+            
             module = new JarFile(file);
             final Enumeration<?> files = module.entries();
             while (files != null && files.hasMoreElements()) {
