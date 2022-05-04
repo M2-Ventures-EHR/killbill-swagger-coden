@@ -250,8 +250,8 @@ public class {{classname}} {
         return httpClient.doGet(uri, {{{returnType}}}.class, requestOptions);
         {{/returnType}}
         {{^returnType}}
-        final Response response = httpClient.doGet(uri, outputStream, requestOptions);
-        return response.getStatusCode();
+        final HttpResponse<InputStream> response = httpClient.doGet(uri, outputStream, requestOptions);
+        return response.statusCode();
         {{/returnType}}
     }
 
