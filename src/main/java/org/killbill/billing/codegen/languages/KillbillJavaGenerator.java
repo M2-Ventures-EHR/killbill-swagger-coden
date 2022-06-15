@@ -33,6 +33,17 @@ public class KillbillJavaGenerator extends AbstractJavaCodegen implements Codege
 
     // Keep track of all visited Reference Models
     private static Set<String> ALL_MODELS = new HashSet<>();
+    
+    private static String QUERY_REQUESTED_DT = "requestedDate";
+    private static String QUERY_ENTITLEMENT_REQUESTED_DT = "entitlementDate";
+    private static String QUERY_BILLING_REQUESTED_DT = "billingDate";
+    
+    private static String CREATE_SUBSCRIPTION = "createSubscription";
+    private static String ADD_BUNDLE_BLOCKING_STATE = "addBundleBlockingState";
+    private static String CREATE_SUBSCRIPTION_WITH_ADDONS = "createSubscriptionWithAddOns";
+    private static String CANCEL_SUBSCRIPTION = "cancelSubscriptionPlan";
+    private static String CHANGE_SUBSCRIPTION_PLAN = "changeSubscriptionPlan";
+    
 
     /**
      * Configures the type of generator.
@@ -196,45 +207,73 @@ public class KillbillJavaGenerator extends AbstractJavaCodegen implements Codege
     // Transform CodegenOperation obj into ExtendedCodegenOperation to add properties into mustache maps
     @Override
     public Map<String, Object> postProcessOperations(Map<String, Object> objs) {
-
         final Map<String, Object> operationsMap = (Map<String, Object>) super.postProcessOperations(objs).get("operations");
         final List<CodegenOperation> operations = (List<CodegenOperation>) operationsMap.get("operation");
         final List<ExtendedCodegenOperation> extOperations = new ArrayList<>(operations.size());
-
         final List<Map<String, String>> imports = (List<Map<String, String>>) objs.get("imports");
-
-
         for (CodegenOperation op : operations) {
             final ExtendedCodegenOperation ext = new ExtendedCodegenOperation(op);
             extOperations.add(ext);
-            if (ext.isReturnModelRefContainer) {
-                addImportIfRequired(imports, String.format("org.killbill.billing.client.model.%s", ext.returnType));
+            addRequiredImports(ext, imports);
+            convertToExtendedCodegenParam(ext, imports);
+            if (shouldAddDateTimeMethod(op)) {
+                addImportIfRequired(imports, "org.joda.time.DateTime");
+                final ExtendedCodegenOperation ext2 = new ExtendedCodegenOperation(op);
+                addRequiredImports(ext2, imports);
+                List<CodegenParameter> allParams = ext2.allParams;
+                for (CodegenParameter parameter : allParams) {
+                    if (isDateParameter(parameter)) {
+                        parameter.dataFormat = "date-time";
+                        parameter.isDate = false;
+                        parameter.isDateTime = true;
+                        parameter.dataType = "DateTime";
+                    }
+                }
+                convertToExtendedCodegenParam(ext2, imports);
+                extOperations.add(ext2);
             }
-            if (ext.isBodyModelRefContainer) {
-                addImportIfRequired(imports, String.format("org.killbill.billing.client.model.%s", ext.bodyParam.dataType));
-            }
-            if (ext.isStream) {
-                addImportIfRequired(imports, "java.io.InputStream");
-                addImportIfRequired(imports, "java.io.OutputStream");
-                addImportIfRequired(imports, "java.net.http.HttpResponse");
-            }
-            if (ext.isListContainer) {
-                addImportIfRequired(imports, "java.util.List");
-            } else if (ext.isMapContainer) {
-                addImportIfRequired(imports, "java.util.Map");
-            }
-
-            // Unfortunately those lists contain different objects -- so a query param from all param is really a different
-            // java object and if needed needs to be converted for each list
-            ext.allParams = convertToExtendedCodegenParam(ext.allParams, imports);
-            ext.bodyParams = convertToExtendedCodegenParam(ext.bodyParams, imports);
-            ext.pathParams = convertToExtendedCodegenParam(ext.pathParams, imports);
-            ext.queryParams = convertToExtendedCodegenParam(ext.queryParams, imports);
-            ext.formParams = convertToExtendedCodegenParam(ext.formParams, imports);
         }
         operationsMap.put("operation", extOperations);
-
         return objs;
+    }
+     
+    private void addRequiredImports(ExtendedCodegenOperation ext, List<Map<String, String>> imports) {
+        if (ext.isReturnModelRefContainer) {
+            addImportIfRequired(imports, String.format("org.killbill.billing.client.model.%s", ext.returnType));
+        }
+        if (ext.isBodyModelRefContainer) {
+            addImportIfRequired(imports, String.format("org.killbill.billing.client.model.%s", ext.bodyParam.dataType));
+        }
+        if (ext.isStream) {
+            addImportIfRequired(imports, "java.io.InputStream");
+            addImportIfRequired(imports, "java.io.OutputStream");
+            addImportIfRequired(imports, "java.net.http.HttpResponse");
+        }
+        if (ext.isListContainer) {
+            addImportIfRequired(imports, "java.util.List");
+        } else if (ext.isMapContainer) {
+            addImportIfRequired(imports, "java.util.Map");
+        }
+
+    }
+    
+    private void convertToExtendedCodegenParam(ExtendedCodegenOperation ext, List<Map<String, String>> imports) {
+        // Unfortunately those lists contain different objects -- so a query param from all param is really a different
+        // java object and if needed needs to be converted for each list
+
+        ext.allParams = convertToExtendedCodegenParam(ext.allParams, imports);
+        ext.bodyParams = convertToExtendedCodegenParam(ext.bodyParams, imports);
+        ext.pathParams = convertToExtendedCodegenParam(ext.pathParams, imports);
+        ext.queryParams = convertToExtendedCodegenParam(ext.queryParams, imports);
+        ext.formParams = convertToExtendedCodegenParam(ext.formParams, imports);
+    }
+
+
+    private boolean shouldAddDateTimeMethod(CodegenOperation op) {
+        return op.operationId.equalsIgnoreCase(ADD_BUNDLE_BLOCKING_STATE) || op.operationId.equalsIgnoreCase(CREATE_SUBSCRIPTION) || op.operationId.equalsIgnoreCase(CREATE_SUBSCRIPTION_WITH_ADDONS) || op.operationId.equalsIgnoreCase(CANCEL_SUBSCRIPTION) || op.operationId.equalsIgnoreCase(CHANGE_SUBSCRIPTION_PLAN);
+    }
+    private boolean isDateParameter(CodegenParameter parameter) {
+        return parameter.baseName.equalsIgnoreCase(QUERY_BILLING_REQUESTED_DT) || parameter.baseName.equalsIgnoreCase(QUERY_ENTITLEMENT_REQUESTED_DT) || parameter.baseName.equalsIgnoreCase(QUERY_REQUESTED_DT);
     }
 
 
