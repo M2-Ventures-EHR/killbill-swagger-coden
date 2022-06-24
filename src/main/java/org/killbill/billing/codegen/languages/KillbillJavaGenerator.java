@@ -43,6 +43,7 @@ public class KillbillJavaGenerator extends AbstractJavaCodegen implements Codege
     private static String CREATE_SUBSCRIPTION_WITH_ADDONS = "createSubscriptionWithAddOns";
     private static String CANCEL_SUBSCRIPTION = "cancelSubscriptionPlan";
     private static String CHANGE_SUBSCRIPTION_PLAN = "changeSubscriptionPlan";
+    private static String ADD_SUBSCRIPTION_BLOCKING_STATE = "addSubscriptionBlockingState";
     
 
     /**
@@ -214,12 +215,13 @@ public class KillbillJavaGenerator extends AbstractJavaCodegen implements Codege
         for (CodegenOperation op : operations) {
             final ExtendedCodegenOperation ext = new ExtendedCodegenOperation(op);
             extOperations.add(ext);
-            addRequiredImports(ext, imports);
+            addAllImportsIfRequired(ext, imports);
             convertToExtendedCodegenParam(ext, imports);
             if (shouldAddDateTimeMethod(op)) {
                 addImportIfRequired(imports, "org.joda.time.DateTime");
+                addImportIfRequired(imports, "org.joda.time.LocalDate");
                 final ExtendedCodegenOperation ext2 = new ExtendedCodegenOperation(op);
-                addRequiredImports(ext2, imports);
+                addAllImportsIfRequired(ext2, imports);
                 List<CodegenParameter> allParams = ext2.allParams;
                 for (CodegenParameter parameter : allParams) {
                     if (isDateParameter(parameter)) {
@@ -237,7 +239,7 @@ public class KillbillJavaGenerator extends AbstractJavaCodegen implements Codege
         return objs;
     }
      
-    private void addRequiredImports(ExtendedCodegenOperation ext, List<Map<String, String>> imports) {
+    private void addAllImportsIfRequired(ExtendedCodegenOperation ext, List<Map<String, String>> imports) {
         if (ext.isReturnModelRefContainer) {
             addImportIfRequired(imports, String.format("org.killbill.billing.client.model.%s", ext.returnType));
         }
@@ -270,7 +272,7 @@ public class KillbillJavaGenerator extends AbstractJavaCodegen implements Codege
 
 
     private boolean shouldAddDateTimeMethod(CodegenOperation op) {
-        return op.operationId.equalsIgnoreCase(ADD_BUNDLE_BLOCKING_STATE) || op.operationId.equalsIgnoreCase(CREATE_SUBSCRIPTION) || op.operationId.equalsIgnoreCase(CREATE_SUBSCRIPTION_WITH_ADDONS) || op.operationId.equalsIgnoreCase(CANCEL_SUBSCRIPTION) || op.operationId.equalsIgnoreCase(CHANGE_SUBSCRIPTION_PLAN);
+        return op.operationId.equalsIgnoreCase(ADD_BUNDLE_BLOCKING_STATE) || op.operationId.equalsIgnoreCase(ADD_SUBSCRIPTION_BLOCKING_STATE) || op.operationId.equalsIgnoreCase(CREATE_SUBSCRIPTION) || op.operationId.equalsIgnoreCase(CREATE_SUBSCRIPTION_WITH_ADDONS) || op.operationId.equalsIgnoreCase(CANCEL_SUBSCRIPTION) || op.operationId.equalsIgnoreCase(CHANGE_SUBSCRIPTION_PLAN);
     }
     private boolean isDateParameter(CodegenParameter parameter) {
         return parameter.baseName.equalsIgnoreCase(QUERY_BILLING_REQUESTED_DT) || parameter.baseName.equalsIgnoreCase(QUERY_ENTITLEMENT_REQUESTED_DT) || parameter.baseName.equalsIgnoreCase(QUERY_REQUESTED_DT);
