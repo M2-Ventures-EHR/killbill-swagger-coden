@@ -17,8 +17,6 @@ import org.killbill.billing.client.KillBillHttpClient;
 import org.killbill.billing.client.RequestOptions;
 import org.killbill.billing.client.RequestOptions.RequestOptionsBuilder;
 
-import org.killbill.commons.utils.Preconditions;
-
 
 /**
  *           DO NOT EDIT !!!
@@ -47,6 +45,13 @@ public class {{classname}} {
         }
     }
 
+    public static <T> T checkNotNull(final T reference, final Object errorMessage) {
+        if (reference == null) {
+            throw new NullPointerException(String.valueOf(errorMessage));
+        }
+        return reference;
+    }
+
     {{#operation}}
     {{#isPost}}
     {{#hasNonRequiredDefaultQueryParams}}
@@ -64,7 +69,7 @@ public class {{classname}} {
         {{#allParams}}
         {{^isHeaderParam}}
         {{#required}}
-        Preconditions.checkNotNull({{paramName}}, "Missing the required parameter '{{paramName}}' when calling {{operationId}}");
+        checkNotNull({{paramName}}, "Missing the required parameter '{{paramName}}' when calling {{operationId}}");
         {{/required}}
         {{/isHeaderParam}}
         {{/allParams}}
@@ -128,7 +133,7 @@ public class {{classname}} {
         {{#allParams}}
         {{^isHeaderParam}}
         {{#required}}
-        Preconditions.checkNotNull({{paramName}}, "Missing the required parameter '{{paramName}}' when calling {{operationId}}");
+        checkNotNull({{paramName}}, "Missing the required parameter '{{paramName}}' when calling {{operationId}}");
         {{/required}}
         {{/isHeaderParam}}
         {{/allParams}}
@@ -186,7 +191,7 @@ public class {{classname}} {
         {{#allParams}}
         {{^isHeaderParam}}
         {{#required}}
-        Preconditions.checkNotNull({{paramName}}, "Missing the required parameter '{{paramName}}' when calling {{operationId}}");
+        checkNotNull({{paramName}}, "Missing the required parameter '{{paramName}}' when calling {{operationId}}");
         {{/required}}
         {{/isHeaderParam}}
         {{/allParams}}
@@ -234,7 +239,7 @@ public class {{classname}} {
         {{#allParams}}
         {{^isHeaderParam}}
         {{#required}}
-        Preconditions.checkNotNull({{paramName}}, "Missing the required parameter '{{paramName}}' when calling {{operationId}}");
+        checkNotNull({{paramName}}, "Missing the required parameter '{{paramName}}' when calling {{operationId}}");
         {{/required}}
         {{/isHeaderParam}}
         {{/allParams}}
