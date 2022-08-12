@@ -1,8 +1,6 @@
 package org.killbill.billing.codegen.languages;
 
 import com.google.common.base.Predicate;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import io.swagger.codegen.*;
 import io.swagger.codegen.languages.AbstractJavaCodegen;
@@ -126,6 +124,7 @@ public class KillbillJavaGenerator extends AbstractJavaCodegen implements Codege
 
         importMapping.clear();
         importMapping.put("UUID", "java.util.UUID");
+        importMapping.put("Collection", "java.util.Collection");
         importMapping.put("List", "java.util.List");
         importMapping.put("LinkedList", "java.util.LinkedList");
         importMapping.put("ArrayList", "java.util.ArrayList");
@@ -172,7 +171,7 @@ public class KillbillJavaGenerator extends AbstractJavaCodegen implements Codege
             Map<String, Object> modelTemplate = (Map<String, Object>) entries;
             final CodegenModel m = (CodegenModel) modelTemplate.get("model");
             if (m.name.equals("Entity")) {
-                return ImmutableMap.of();
+                return Collections.emptyMap();
             }
 
             final Iterator<CodegenProperty> it  = m.vars.iterator();
@@ -448,6 +447,9 @@ public class KillbillJavaGenerator extends AbstractJavaCodegen implements Codege
                 this.returnType = String.format("%ss", this.returnBaseType);
             }
             this.isStream = produces != null && !produces.isEmpty() && produces.get(0).get("mediaType").equals("application/octet-stream");
+            this.hasNonRequiredDefaultQueryParams = this.queryParams
+                    .stream()
+                    .anyMatch(input -> !input.required && input.defaultValue != null);
             this.hasNonRequiredDefaultQueryParams = Iterables.any(this.queryParams, new Predicate<CodegenParameter>() {
                 @Override
                 public boolean apply(CodegenParameter input) {
