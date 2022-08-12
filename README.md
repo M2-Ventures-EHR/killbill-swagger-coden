@@ -1,7 +1,7 @@
 # Kill Bill Client Code Generation
 
 This repository is an extension of the [swagger coden module](https://github.com/swagger-api/swagger-codegen#making-your-own-codegen-modules),
-and is used to generate our Kill Bill client libraries. It contains both a set of templates and and java modules to allow to customize the generated client library.
+and is used to generate our Kill Bill client libraries. It contains both a set of templates and java modules to allow to customize the generated client library.
 
 
 The repo was generated using the [`meta` verb from the code generator](https://github.com/swagger-api/swagger-codegen#making-your-own-codegen-modules),
@@ -87,11 +87,11 @@ The code customization allows for the following:
 
 In addition to code customization, we can also define our own Mustache templates to generate the client code we want to have.
 
-Modifying the generator, including the Mustache template would require building the repo: `mvn -DskipTests=true -Dmaven.javadoc.skip=true install`
-
 So, in summary, the `kbswagger.json` input along with the custom code and templates provide a flexible way to generate client libraries in any language.
 
+## Modifying the generator
 
+To modifying the generator, including the Mustache template would require building the repo: `mvn -DskipTests=true -Dmaven.javadoc.skip=true install`
 
 # Supported Languages
 
