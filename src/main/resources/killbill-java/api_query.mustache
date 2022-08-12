@@ -1,20 +1,20 @@
         {{#queryParams}}
         {{#-first}}
-        final Multimap<String, String> queryParams = LinkedListMultimap.create(inputOptions.getQueryParams());
+        final Map<String, Collection<String>> queryParams = new HashMap<>(inputOptions.getQueryParams());
         {{/-first}}
         {{/queryParams}}
         {{#queryParams}}
         {{#isListContainer}}
         if ({{paramName}} != null) {
             {{#isEnum}}
-            queryParams.putAll("{{baseName}}", Converter.convertEnumListToStringList({{paramName}}));
+            addToMapValues(queryParams, "{{baseName}}", Converter.convertEnumListToStringList({{paramName}}));
             {{/isEnum}}
             {{^isEnum}}
             {{#isUuid}}
-            queryParams.putAll("{{baseName}}", Converter.convertUUIDListToStringList({{paramName}}));
+            addToMapValues(queryParams, "{{baseName}}", Converter.convertUUIDListToStringList({{paramName}}));
             {{/isUuid}}
             {{^isUuid}}
-            queryParams.putAll("{{baseName}}", {{paramName}});
+            addToMapValues(queryParams, "{{baseName}}", {{paramName}});
             {{/isUuid}}
             {{/isEnum}}
         }
@@ -23,13 +23,13 @@
         {{#isMapContainer}}
         {{#isQueryPluginProperty}}
         if ({{paramName}} != null) {
-            queryParams.putAll("{{baseName}}", Converter.convertPluginPropertyMap({{paramName}}));
+            addToMapValues(queryParams, "{{baseName}}", Converter.convertPluginPropertyMap({{paramName}}));
         }
         {{/isQueryPluginProperty}}
         {{/isMapContainer}}
         {{^isMapContainer}}
         if ({{paramName}} != null) {
-            queryParams.put("{{baseName}}", String.valueOf({{paramName}}));
+            addToMapValues(queryParams, "{{baseName}}", List.of(String.valueOf({{paramName}})));
         }
         {{/isMapContainer}}
         {{/isListContainer}}
