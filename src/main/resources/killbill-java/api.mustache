@@ -2,14 +2,14 @@
 
 package {{package}};
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Objects;
 
 {{#imports}}import {{import}};
 {{/imports}}
-
-import com.google.common.collect.Multimap;
-import com.google.common.base.Preconditions;
-import com.google.common.base.MoreObjects;
-import com.google.common.collect.LinkedListMultimap;
 
 import org.killbill.billing.client.Converter;
 import org.killbill.billing.client.KillBillClientException;
@@ -37,6 +37,21 @@ public class {{classname}} {
         this.httpClient = httpClient;
     }
 
+    private <K, V> void addToMapValues(final Map<K, Collection<V>> map, final K key, final Collection<V> values) {
+        if (map.containsKey(key)) {
+            map.get(key).addAll(values);
+        } else {
+            map.put(key, values);
+        }
+    }
+
+    public static <T> T checkNotNull(final T reference, final Object errorMessage) {
+        if (reference == null) {
+            throw new NullPointerException(String.valueOf(errorMessage));
+        }
+        return reference;
+    }
+
     {{#operation}}
     {{#isPost}}
     {{#hasNonRequiredDefaultQueryParams}}
@@ -54,7 +69,7 @@ public class {{classname}} {
         {{#allParams}}
         {{^isHeaderParam}}
         {{#required}}
-        Preconditions.checkNotNull({{paramName}}, "Missing the required parameter '{{paramName}}' when calling {{operationId}}");
+        checkNotNull({{paramName}}, "Missing the required parameter '{{paramName}}' when calling {{operationId}}");
         {{/required}}
         {{/isHeaderParam}}
         {{/allParams}}
@@ -64,7 +79,7 @@ public class {{classname}} {
 
 {{>api_query}}
         final RequestOptionsBuilder inputOptionsBuilder = inputOptions.extend();
-        final Boolean followLocation = MoreObjects.firstNonNull(inputOptions.getFollowLocation(), Boolean.TRUE);
+        final Boolean followLocation = Objects.requireNonNullElse(inputOptions.getFollowLocation(), Boolean.TRUE);
         inputOptionsBuilder.withFollowLocation(followLocation);
         {{#queryParams}}
         {{#-first}}
@@ -118,7 +133,7 @@ public class {{classname}} {
         {{#allParams}}
         {{^isHeaderParam}}
         {{#required}}
-        Preconditions.checkNotNull({{paramName}}, "Missing the required parameter '{{paramName}}' when calling {{operationId}}");
+        checkNotNull({{paramName}}, "Missing the required parameter '{{paramName}}' when calling {{operationId}}");
         {{/required}}
         {{/isHeaderParam}}
         {{/allParams}}
@@ -176,7 +191,7 @@ public class {{classname}} {
         {{#allParams}}
         {{^isHeaderParam}}
         {{#required}}
-        Preconditions.checkNotNull({{paramName}}, "Missing the required parameter '{{paramName}}' when calling {{operationId}}");
+        checkNotNull({{paramName}}, "Missing the required parameter '{{paramName}}' when calling {{operationId}}");
         {{/required}}
         {{/isHeaderParam}}
         {{/allParams}}
@@ -224,7 +239,7 @@ public class {{classname}} {
         {{#allParams}}
         {{^isHeaderParam}}
         {{#required}}
-        Preconditions.checkNotNull({{paramName}}, "Missing the required parameter '{{paramName}}' when calling {{operationId}}");
+        checkNotNull({{paramName}}, "Missing the required parameter '{{paramName}}' when calling {{operationId}}");
         {{/required}}
         {{/isHeaderParam}}
         {{/allParams}}
