@@ -2,10 +2,6 @@
 
 package {{package}};
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
 import java.util.Objects;
 
 {{#imports}}import {{import}};
@@ -17,6 +13,9 @@ import org.killbill.billing.client.KillBillHttpClient;
 import org.killbill.billing.client.RequestOptions;
 import org.killbill.billing.client.RequestOptions.RequestOptionsBuilder;
 
+import org.killbill.billing.client.util.Preconditions;
+import org.killbill.billing.client.util.Multimap;
+import org.killbill.billing.client.util.TreeMapSetMultimap;
 
 /**
  *           DO NOT EDIT !!!
@@ -37,21 +36,6 @@ public class {{classname}} {
         this.httpClient = httpClient;
     }
 
-    private <K, V> void addToMapValues(final Map<K, Collection<V>> map, final K key, final Collection<V> values) {
-        if (map.containsKey(key)) {
-            map.get(key).addAll(values);
-        } else {
-            map.put(key, values);
-        }
-    }
-
-    public static <T> T checkNotNull(final T reference, final Object errorMessage) {
-        if (reference == null) {
-            throw new NullPointerException(String.valueOf(errorMessage));
-        }
-        return reference;
-    }
-
     {{#operation}}
     {{#isPost}}
     {{#hasNonRequiredDefaultQueryParams}}
@@ -69,7 +53,7 @@ public class {{classname}} {
         {{#allParams}}
         {{^isHeaderParam}}
         {{#required}}
-        checkNotNull({{paramName}}, "Missing the required parameter '{{paramName}}' when calling {{operationId}}");
+        Preconditions.checkNotNull({{paramName}}, "Missing the required parameter '{{paramName}}' when calling {{operationId}}");
         {{/required}}
         {{/isHeaderParam}}
         {{/allParams}}
@@ -83,7 +67,7 @@ public class {{classname}} {
         inputOptionsBuilder.withFollowLocation(followLocation);
         {{#queryParams}}
         {{#-first}}
-        inputOptionsBuilder.withQueryParams(queryParams);
+        inputOptionsBuilder.withQueryParams(queryParams.asMap());
         {{/-first}}
         {{/queryParams}}
         {{#hasProduces}}
@@ -133,7 +117,7 @@ public class {{classname}} {
         {{#allParams}}
         {{^isHeaderParam}}
         {{#required}}
-        checkNotNull({{paramName}}, "Missing the required parameter '{{paramName}}' when calling {{operationId}}");
+        Preconditions.checkNotNull({{paramName}}, "Missing the required parameter '{{paramName}}' when calling {{operationId}}");
         {{/required}}
         {{/isHeaderParam}}
         {{/allParams}}
@@ -145,7 +129,7 @@ public class {{classname}} {
         final RequestOptionsBuilder inputOptionsBuilder = inputOptions.extend();
         {{#queryParams}}
         {{#-first}}
-        inputOptionsBuilder.withQueryParams(queryParams);
+        inputOptionsBuilder.withQueryParams(queryParams.asMap());
         {{/-first}}
         {{/queryParams}}
         {{#hasProduces}}
@@ -191,7 +175,7 @@ public class {{classname}} {
         {{#allParams}}
         {{^isHeaderParam}}
         {{#required}}
-        checkNotNull({{paramName}}, "Missing the required parameter '{{paramName}}' when calling {{operationId}}");
+        Preconditions.checkNotNull({{paramName}}, "Missing the required parameter '{{paramName}}' when calling {{operationId}}");
         {{/required}}
         {{/isHeaderParam}}
         {{/allParams}}
@@ -203,7 +187,7 @@ public class {{classname}} {
         final RequestOptionsBuilder inputOptionsBuilder = inputOptions.extend();
         {{#queryParams}}
         {{#-first}}
-        inputOptionsBuilder.withQueryParams(queryParams);
+        inputOptionsBuilder.withQueryParams(queryParams.asMap());
         {{/-first}}
         {{/queryParams}}
         {{#hasProduces}}
@@ -239,7 +223,7 @@ public class {{classname}} {
         {{#allParams}}
         {{^isHeaderParam}}
         {{#required}}
-        checkNotNull({{paramName}}, "Missing the required parameter '{{paramName}}' when calling {{operationId}}");
+        Preconditions.checkNotNull({{paramName}}, "Missing the required parameter '{{paramName}}' when calling {{operationId}}");
         {{/required}}
         {{/isHeaderParam}}
         {{/allParams}}
@@ -251,7 +235,7 @@ public class {{classname}} {
         final RequestOptionsBuilder inputOptionsBuilder = inputOptions.extend();
         {{#queryParams}}
         {{#-first}}
-        inputOptionsBuilder.withQueryParams(queryParams);
+        inputOptionsBuilder.withQueryParams(queryParams.asMap());
         {{/-first}}
         {{/queryParams}}
         {{#hasProduces}}
