@@ -101,13 +101,13 @@ So, in summary, the `kbswagger.json` input along with the custom code and templa
 
 ## Modifying the generator
 
-To modifying the generator, including the Mustache template would require building the repo: `mvn -DskipTests=true -Dmaven.javadoc.skip=true install`
+Modifying the generator, including the Mustache template would require building the repo: `mvn -DskipTests=true -Dmaven.javadoc.skip=true install`
 
 # Supported Languages
 
 ## Java
 
-There is a new swagger module called `killbill-java`, that is used to generate the java client library. As explained earlier
+There is a swagger module called `killbill-java`, that is used to generate the java client library. As explained earlier
 it consists of some templates and code module:
 
 * [KillbillJavaGenerator](https://github.com/killbill/killbill-swagger-coden/blob/master/src/main/java/org/killbill/billing/codegen/languages/KillbillJavaGenerator.java)
@@ -124,7 +124,7 @@ sh build.sh -l killbill-java -o ../killbill-client-java
 
 ## Python
 
-There is a new swagger module called `killbill-python`, that is used to generate the python client library.
+There is a swagger module called `killbill-python`, that is used to generate the python client library.
 
 * [KillbillPythonGenerator](https://github.com/killbill/killbill-swagger-coden/blob/master/src/main/java/org/killbill/billing/codegen/languages/KillbillPythonGenerator.java)
 * [killbill-python](https://github.com/killbill/killbill-swagger-coden/tree/master/src/main/resources/killbill-python) templates.
