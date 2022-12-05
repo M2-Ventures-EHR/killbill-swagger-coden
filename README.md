@@ -1,7 +1,7 @@
 # Kill Bill Client Code Generation
 
 This repository is an extension of the [swagger coden module](https://github.com/swagger-api/swagger-codegen#making-your-own-codegen-modules),
-and is used to generate our Kill Bill client libraries. It contains both a set of templates and and java modules to allow to customize the generated client library.
+and is used to generate our Kill Bill client libraries. It contains both a set of templates and java modules to allow to customize the generated client library.
 
 
 The repo was generated using the [`meta` verb from the code generator](https://github.com/swagger-api/swagger-codegen#making-your-own-codegen-modules),
@@ -55,20 +55,30 @@ swagger-codegen  generate \
 -o ../killbill-client-java # Repo where to generate the code
 ```
 
+## Using the build.sh script
 
-However, to simplify things one can use the `build.sh` script (On Windows, you can use [Git Bash](https://git-scm.com/download/win) to run this script):
+To simplify the build process, this repo includes a [build.sh](https://github.com/killbill/killbill-swagger-coden/blob/a8de9958143f1954f53ff6634594e13f1c43909d/build.sh) script. We recommend that you use this script to build the client libraries. This script does the following:
 
-* The script will retrieve the KB version (requires a running instance of Kill Bill)
-* The script will retrieve the swagger spec (requires a running instance of Kill Bill)
-* It will then run the generator
-* Finally it will copy the `VERSION` file, under the client `.swagger-codegen` directory to keep track of the api against which this was generated.
+* Retrieves the KB version (requires a running instance of Kill Bill).
+* Retrieves the swagger spec (requires a running instance of Kill Bill).
+* Runs the generator.
+* Copies the `VERSION` file, under the client `.swagger-codegen` directory to keep track of the api against which this was generated.
 
-The script contains a first section that may be required to edit if default settings are not acceptable (KB URL, path for binaries, ...)
+In order to run this script, do the following:
 
-```
-# Generate the KB client code and wait for debugger to start on port 5005:
-> ./build.sh -l killbill-java -o ../killbill-client-java -w
-```
+* Ensure that you have a running Kill Bill instance
+* Build this repo to generate the `killbill-swagger-codegen.jar` file as follows:
+
+        mvn clean install -DskipTests=true
+* Update `build.sh` as desired (You may need to update the `killbill-swagger-coden.jar` path, path of your local maven repo, etc.).
+* Run the script as follows (On Windows, you can use [Git Bash](https://git-scm.com/download/win) to run this script):
+
+        sh build.sh -l killbill-java -o ../killbill-client-java 
+    
+* To generate the KB client code and wait for debugger to start on port 5005 use:
+
+
+        > ./build.sh -l killbill-java -o ../killbill-client-java -w
 
 
 ## Internals
@@ -87,11 +97,11 @@ The code customization allows for the following:
 
 In addition to code customization, we can also define our own Mustache templates to generate the client code we want to have.
 
-Modifying the generator, including the Mustache template would require building the repo: `mvn -DskipTests=true -Dmaven.javadoc.skip=true install`
-
 So, in summary, the `kbswagger.json` input along with the custom code and templates provide a flexible way to generate client libraries in any language.
 
+## Modifying the generator
 
+To modifying the generator, including the Mustache template would require building the repo: `mvn -DskipTests=true -Dmaven.javadoc.skip=true install`
 
 # Supported Languages
 
@@ -105,8 +115,12 @@ it consists of some templates and code module:
 
 The code generation has been limited to generating model and api files, but at this point we have decided to reuse our existing http client, and reuse the mechanism we have in place, [RequestOptions](https://github.com/killbill/killbill-client-java/blob/killbill-client-java-0.41.7/src/main/java/org/killbill/billing/client/RequestOptions.java) --to pass additional headers through our apis.
 
+In order to generate the Java client, use:
 
-The generated code has been check-in in the existing Kill Bill [client java repo](https://github.com/killbill/killbill-client-java), but in a branch called `swagger-gen`. Note that, at this point this is still an experiment, and we don't know whether this branch will eventually be merged.
+```
+sh build.sh -l killbill-java -o ../killbill-client-java 
+```
+
 
 ## Python
 
@@ -117,6 +131,7 @@ There is a new swagger module called `killbill-python`, that is used to generate
 
 
 To generate the client enter the following command:
+
 ```sh
 > ./build.sh -l killbill-python -o ../killbill-client-python
 ```
@@ -128,5 +143,3 @@ test/*
 git_push.sh
 ```
 [Reff: How to skip certain files during code generation?](https://github.com/swagger-api/swagger-codegen/wiki/FAQ#how-to-skip-certain-files-during-code-generation)
-
-
