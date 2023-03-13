@@ -1,6 +1,6 @@
         {{#queryParams}}
         {{#-first}}
-        final Multimap<String, String> queryParams = LinkedListMultimap.create(inputOptions.getQueryParams());
+        final Multimap<String, String> queryParams = new TreeMapSetMultimap<>(inputOptions.getQueryParams());
         {{/-first}}
         {{/queryParams}}
         {{#queryParams}}
