@@ -12,10 +12,10 @@
 #
 # RUNNING INSTANCE OF KILL BILL
 #
-KILLBILL_BASE_URL=http://127.0.0.1:8080
+KILLBILL_BASE_URL=http://127.0.0.1:5003
 KB_USER_CREDS="admin:password"
-KB_API_KEY=bob
-KB_API_SECRET=lazar
+KB_API_KEY=default
+KB_API_SECRET=default
 
 
 # UPDATE BASED ON ENVIRONMENT
@@ -32,7 +32,7 @@ M2="$HOME/.m2"
 #
 # LOCATION OF THE SWAGGER swagger-codegen-cli.jar
 #
-SWAGGER_CODEGEN_VERSION="2.4.1"
+SWAGGER_CODEGEN_VERSION="2.4.36"
 SWAGGER_CODEGEN_JAR="$M2/repository/io/swagger/swagger-codegen-cli/$SWAGGER_CODEGEN_VERSION/swagger-codegen-cli-$SWAGGER_CODEGEN_VERSION.jar"
 
 KB_SWAGGER_CODEGEN_VERSION="1.0.0"
@@ -239,9 +239,9 @@ function generate_client_code() {
   -DgenerateApiDocs=false \
   -cp $SWAGGER_CODEGEN_JAR:$KB_SWAGGER_CODEGEN_JAR \
   io.swagger.codegen.SwaggerCodegen generate \
-  -l $client  \
-  -i $swaggerInput  \
-  -o $output
+  -l "python"  \
+  -i "./kbswagger.yaml"  \
+  -o "/mnt/c/dev/projects/practicenow/practicenow/external/killbill-client-python"
 }
 
 function copy_files() {
